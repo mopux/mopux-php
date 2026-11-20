@@ -76,5 +76,15 @@
     "scripts-descriptions": {
         "sync-spec": "Copy the public OpenAPI spec from the Mopux repository (override the source with MOPUX_SPEC).",
         "test:contract": "Check that every operation of resources/openapi.yaml is covered by the SDK."
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "Mopux\\Laravel\\MopuxServiceProvider"
+            ],
+            "aliases": {
+                "Mopux": "Mopux\\Laravel\\Facades\\Mopux"
+            }
+        }
     }
 }

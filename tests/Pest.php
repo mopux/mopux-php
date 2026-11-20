@@ -5,12 +5,15 @@ use Mopux\Config;
 use Mopux\Http\RetryPolicy;
 use Mopux\Testing\MockClient;
 use Mopux\Testing\MockResponse;
+use Mopux\Tests\Laravel\TestCase;
 
 /*
 |--------------------------------------------------------------------------
 | Test configuration
 |--------------------------------------------------------------------------
 */
+
+uses(TestCase::class)->in('Laravel');
 
 /**
  * Decoded JSON fixture from tests/fixtures.
