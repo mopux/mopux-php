@@ -1,0 +1,7 @@
+parameters:
+    level: max
+    # Lowest supported PHP version: reports syntax/features newer than 8.2.
+    phpVersion: 80200
+    paths:
+        - src
+    tmpDir: .phpstan.cache
