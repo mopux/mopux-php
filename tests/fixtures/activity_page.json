@@ -1,0 +1,67 @@
+{
+  "data": [
+    {
+      "id": 900,
+      "type": "update-task-status",
+      "description": "Ada ha cambiado el estado",
+      "actor": {
+        "id": 3,
+        "name": "Ada Lovelace",
+        "avatar": "https://acme.mopux.com/media/ada.png"
+      },
+      "affected_user": null,
+      "project": {
+        "id": 12,
+        "title": "Web corporativa"
+      },
+      "task": {
+        "id": 101,
+        "title": "Diseñar la API"
+      },
+      "group": null,
+      "comment_id": null,
+      "media": null,
+      "changes": {
+        "old_status": 0,
+        "status": 1
+      },
+      "occurred_at": "2026-11-20 10:15:00"
+    },
+    {
+      "id": 901,
+      "type": "create-task",
+      "description": "Ada ha cambiado el estado",
+      "actor": null,
+      "affected_user": null,
+      "project": {
+        "id": 12,
+        "title": "Web corporativa"
+      },
+      "task": {
+        "id": null,
+        "title": "Tarea borrada"
+      },
+      "group": null,
+      "comment_id": null,
+      "media": null,
+      "changes": [],
+      "occurred_at": "2026-11-20 10:15:00"
+    }
+  ],
+  "links": {
+    "first": "https://acme.mopux.com/api/v1/projects/12/activity?page=1",
+    "last": "https://acme.mopux.com/api/v1/projects/12/activity?page=4",
+    "prev": null,
+    "next": "https://acme.mopux.com/api/v1/projects/12/activity?page=2"
+  },
+  "meta": {
+    "current_page": 1,
+    "from": 1,
+    "last_page": 4,
+    "links": [],
+    "path": "https://acme.mopux.com/api/v1/projects/12/activity",
+    "per_page": 2,
+    "to": 2,
+    "total": 8
+  }
+}
