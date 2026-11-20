@@ -10,6 +10,8 @@ use Mopux\Config;
 use Mopux\Exceptions\ConnectionException;
 use Mopux\Exceptions\MalformedResponseException;
 use Mopux\Exceptions\MopuxException;
+use Mopux\Http\Auth\RefreshableTokenProvider;
+use Mopux\Http\Auth\TokenProvider;
 use Mopux\Version;
 use Psr\Http\Client\ClientExceptionInterface;
 use Psr\Http\Client\ClientInterface;
@@ -65,7 +67,7 @@ final class Connector
         return new self($config, $this->client, $this->requestFactory, $this->streamFactory);
     }
 
-    public function withToken(?string $token): self
+    public function withToken(string|TokenProvider|null $token): self
     {
         return $this->withConfig($this->config->withToken($token));
     }
@@ -130,6 +132,7 @@ final class Connector
         $path = ltrim($path, '/');
         $request = $this->buildRequest($method, $path, $query, $json, $body, $headers);
         $retry = $this->config->retry;
+        $refreshed = false;
 
         for ($attempt = 0; ; $attempt++) {
             try {
@@ -149,6 +152,15 @@ final class Connector
                 continue;
             }
 
+            if ($response->getStatusCode() === 401 && ! $refreshed && $this->canResend($request) && $this->refreshToken()) {
+                $refreshed = true;
+                $attempt--;
+                $this->rewind($request);
+                $request = $request->withHeader('Authorization', 'Bearer '.$this->config->token());
+
+                continue;
+            }
+
             $delay = $this->canResend($request)
                 ? $retry->delayAfterResponse($method, $response->getStatusCode(), $response->getHeaderLine('Retry-After'), $attempt)
                 : null;
@@ -160,6 +172,13 @@ final class Connector
             $retry->sleep($delay);
             $this->rewind($request);
         }
+    }
+
+    private function refreshToken(): bool
+    {
+        $provider = $this->config->tokenProvider;
+
+        return $provider instanceof RefreshableTokenProvider && $provider->refresh();
     }
 
     private function rewind(RequestInterface $request): void
@@ -203,8 +222,10 @@ final class Connector
             ->withHeader('Accept', 'application/json')
             ->withHeader('User-Agent', $this->userAgent());
 
-        if ($this->config->token !== null) {
-            $request = $request->withHeader('Authorization', 'Bearer '.$this->config->token);
+        $token = $this->config->token();
+
+        if ($token !== null) {
+            $request = $request->withHeader('Authorization', 'Bearer '.$token);
         }
 
         if ($json !== null) {

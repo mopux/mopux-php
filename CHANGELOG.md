@@ -13,3 +13,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Exception hierarchy mapped from HTTP statuses (401, 403, 404, 422, 429, 4xx, 5xx) with `UncertainWriteException` for failed writes.
 - `Http\RetryPolicy` (enabled by default, 2 retries): 429 for every method honouring `Retry-After`; network errors and 5xx only for GET/HEAD/OPTIONS. Writes are never retried after an uncertain failure.
 - `Testing\MockClient`, `MockResponse`, `RecordedRequest` and `NetworkError` to fake the API in tests, with `assertSent()`, `assertNotSent()`, `assertSentCount()` and `assertNothingSent()`.
+- `Mopux` entry point (`new Mopux($url, $token)`, `Mopux::login()`, `forTenant()`, `withToken()`) and `auth()` resource (login, logout, user).
+- Token providers: `StaticToken`, `CallbackToken` and `RefreshableTokenProvider` (one automatic refresh and resend after a 401, for OAuth).
+- `Data\User` and `Data\AuthToken`, built on a typed, lenient payload reader.
