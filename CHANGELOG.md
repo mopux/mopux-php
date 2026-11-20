@@ -16,3 +16,4 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `Mopux` entry point (`new Mopux($url, $token)`, `Mopux::login()`, `forTenant()`, `withToken()`) and `auth()` resource (login, logout, user).
 - Token providers: `StaticToken`, `CallbackToken` and `RefreshableTokenProvider` (one automatic refresh and resend after a 401, for OAuth).
 - `Data\User` and `Data\AuthToken`, built on a typed, lenient payload reader.
+- Enums: `TaskStatus` (with read-only `Delayed`), `TaskPriority`, `ProjectStatus`, `AssigneeOperation`, `ActivityFilter`, `NotificationFilter`, `TouchBox`, `TouchStatus`, `InvitationStatus`.
