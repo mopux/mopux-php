@@ -1,0 +1,35 @@
+{
+  "tasks": [
+    {
+      "id": 102,
+      "title": "Diseñar la API",
+      "description": "Revisar **endpoints**",
+      "status": -1,
+      "priority": 0,
+      "date_start": null,
+      "date_end": "2026-11-30",
+      "hours_expected": null,
+      "hours_inverted": null,
+      "assigned_to": 3,
+      "project": {
+        "id": 12,
+        "title": "Web corporativa"
+      },
+      "group": {
+        "id": 7,
+        "title": "Backlog"
+      },
+      "assignees": [
+        {
+          "id": 3,
+          "name": "Ada Lovelace",
+          "avatar": "https://acme.mopux.com/media/ada.png"
+        }
+      ],
+      "comments_count": 2,
+      "medias_count": 1,
+      "updated_at": "2026-11-20 10:15:00"
+    }
+  ],
+  "limit": 5
+}

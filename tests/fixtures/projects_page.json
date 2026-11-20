@@ -1,0 +1,37 @@
+{
+  "data": [
+    {
+      "id": 13,
+      "title": "App móvil",
+      "description": null,
+      "status": -1,
+      "date_starts": null,
+      "date_ends": null,
+      "owner": {
+        "id": null,
+        "name": null,
+        "avatar": null
+      },
+      "users_count": 1,
+      "tasks_count": 0,
+      "done_count": 0,
+      "updated_at": "2026-11-01 08:00:00"
+    }
+  ],
+  "links": {
+    "first": "https://acme.mopux.com/api/v1/projects?page=1",
+    "last": "https://acme.mopux.com/api/v1/projects?page=3",
+    "prev": null,
+    "next": "https://acme.mopux.com/api/v1/projects?page=2"
+  },
+  "meta": {
+    "current_page": 1,
+    "from": 1,
+    "last_page": 3,
+    "links": [],
+    "path": "https://acme.mopux.com/api/v1/projects",
+    "per_page": 1,
+    "to": 1,
+    "total": 3
+  }
+}

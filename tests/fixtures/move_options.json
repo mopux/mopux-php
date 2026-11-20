@@ -1,0 +1,24 @@
+{
+  "current_project_id": 12,
+  "current_group_id": 7,
+  "projects": [
+    {
+      "id": 13,
+      "title": "App móvil",
+      "groups": [
+        {
+          "id": 20,
+          "title": "Inicio",
+          "position": 1
+        }
+      ],
+      "warnings": [
+        {
+          "code": "task_user_not_in_project",
+          "user_id": 5,
+          "message": "Bob no está en el proyecto App móvil"
+        }
+      ]
+    }
+  ]
+}

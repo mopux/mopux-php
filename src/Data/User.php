@@ -11,7 +11,7 @@ use Mopux\Support\Payload;
  * The authenticated user (`GET auth/user`). The login response only includes
  * id, name and email; the other fields are null there.
  */
-final class User
+final class User implements DataObject
 {
     public function __construct(
         public readonly int $id,
@@ -28,7 +28,7 @@ final class User
     /**
      * @param  array<array-key, mixed>  $data
      */
-    public static function fromArray(array $data): self
+    public static function fromArray(array $data): static
     {
         $payload = Payload::of($data, 'user');
 

@@ -1,0 +1,14 @@
+{
+  "group": {
+    "id": 7,
+    "project_id": 12,
+    "title": "Backlog"
+  },
+  "summary": {
+    "pending": 20,
+    "doing": 5,
+    "revision": 3,
+    "done": 0,
+    "total": 28
+  }
+}

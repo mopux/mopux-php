@@ -108,6 +108,42 @@ final class Payload
     }
 
     /**
+     * Backed enum value; unknown values throw so new API states are noticed.
+     *
+     * @template E of \BackedEnum
+     *
+     * @param  class-string<E>  $enum
+     * @return E
+     */
+    public function enum(string $key, string $enum): \BackedEnum
+    {
+        return $this->nullableEnum($key, $enum) ?? throw $this->invalid($key, 'a '.$enum.' value');
+    }
+
+    /**
+     * @template E of \BackedEnum
+     *
+     * @param  class-string<E>  $enum
+     * @return E|null
+     */
+    public function nullableEnum(string $key, string $enum): ?\BackedEnum
+    {
+        $value = $this->data[$key] ?? null;
+
+        if ($value === null) {
+            return null;
+        }
+
+        $value = is_string($value) && preg_match('/^-?\d+$/', $value) === 1 ? (int) $value : $value;
+
+        if (! is_int($value) && ! is_string($value)) {
+            throw $this->invalid($key, 'a '.$enum.' value', $value);
+        }
+
+        return $enum::tryFrom($value) ?? throw $this->invalid($key, 'a '.$enum.' value', $value);
+    }
+
+    /**
      * Dates come as `Y-m-d H:i:s` or `Y-m-d` (and ISO 8601 in a few places).
      */
     public function nullableDate(string $key): ?DateTimeImmutable

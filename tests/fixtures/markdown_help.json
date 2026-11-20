@@ -1,0 +1,10 @@
+{
+  "guide_url": "https://www.markdownguide.org/basic-syntax/",
+  "mention_hint": "Type \"@\" to mention users from the same project.",
+  "examples": [
+    {
+      "input": "esto es **negrita**",
+      "output": "esto es <b>negrita</b>"
+    }
+  ]
+}

@@ -1,0 +1,27 @@
+{
+  "id": 900,
+  "type": "update-task-status",
+  "description": "Ada ha cambiado el estado",
+  "actor": {
+    "id": 3,
+    "name": "Ada Lovelace",
+    "avatar": "https://acme.mopux.com/media/ada.png"
+  },
+  "affected_user": null,
+  "project": {
+    "id": 12,
+    "title": "Web corporativa"
+  },
+  "task": {
+    "id": 101,
+    "title": "Diseñar la API"
+  },
+  "group": null,
+  "comment_id": null,
+  "media": null,
+  "changes": {
+    "old_status": 0,
+    "status": 1
+  },
+  "occurred_at": "2026-11-20 10:15:00"
+}

@@ -17,3 +17,4 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Token providers: `StaticToken`, `CallbackToken` and `RefreshableTokenProvider` (one automatic refresh and resend after a 401, for OAuth).
 - `Data\User` and `Data\AuthToken`, built on a typed, lenient payload reader.
 - Enums: `TaskStatus` (with read-only `Delayed`), `TaskPriority`, `ProjectStatus`, `AssigneeOperation`, `ActivityFilter`, `NotificationFilter`, `TouchBox`, `TouchStatus`, `InvitationStatus`.
+- Read data objects mirroring the API resources: `Task`, `TaskGroup`, `Project`, `ProjectBoard`, `ProjectStatistics` (`GroupStatistics`, `PersonWorkload`, `StatusCounts`), `ProjectActivity`, `Comment` (`CommentParent`, `Mention`), `Attachment`, `Notification`, `Touch`, `TeamMember`, `TeamInvitation`, `MoveOptions` (`MoveDestination`, `MoveWarning`), `MarkdownHelp`, `UserBrief` and `Reference`.

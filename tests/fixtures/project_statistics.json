@@ -1,0 +1,41 @@
+{
+  "project": {
+    "id": 12,
+    "title": "Web corporativa"
+  },
+  "total": 40,
+  "completed": 10,
+  "pending": 30,
+  "progress": 25,
+  "groups": [
+    {
+      "id": 7,
+      "title": "Backlog",
+      "status": 0,
+      "total": 30,
+      "progress": 0,
+      "counts": {
+        "pending": 20,
+        "doing": 5,
+        "revision": 3,
+        "done": 0,
+        "delayed": 2
+      }
+    }
+  ],
+  "people": [
+    {
+      "user": {
+        "id": 3,
+        "name": "Ada Lovelace",
+        "avatar": "https://acme.mopux.com/media/ada.png"
+      },
+      "total": 12,
+      "pending": 9,
+      "completed": 3
+    }
+  ],
+  "unassigned": 4,
+  "without_tasks": 1,
+  "multiple_assignees": 2
+}

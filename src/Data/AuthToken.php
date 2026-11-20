@@ -11,7 +11,7 @@ use Mopux\Support\Payload;
  *
  * Store the token securely; the API only returns it once.
  */
-final class AuthToken
+final class AuthToken implements DataObject
 {
     public function __construct(
         public readonly string $token,
@@ -22,7 +22,7 @@ final class AuthToken
     /**
      * @param  array<array-key, mixed>  $data
      */
-    public static function fromArray(array $data): self
+    public static function fromArray(array $data): static
     {
         $payload = Payload::of($data);
 

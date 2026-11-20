@@ -1,0 +1,16 @@
+{
+  "id": "9b2f6a3e-1c1d-4e8f-9f0a-6f1d2c3b4a5e",
+  "type": "App\\Notifications\\TaskAssigned",
+  "title": "Nueva tarea",
+  "message": "Te han asignado una tarea",
+  "route": "https://acme.mopux.com/tasks/101",
+  "karma": null,
+  "data": {
+    "title": "Nueva tarea",
+    "task_id": 101
+  },
+  "is_read": false,
+  "read_at": null,
+  "created_at": "2026-11-20 10:00:00",
+  "updated_at": "2026-11-20 10:00:00"
+}

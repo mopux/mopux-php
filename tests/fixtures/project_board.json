@@ -1,0 +1,59 @@
+{
+  "id": 12,
+  "title": "Web corporativa",
+  "description": null,
+  "status": 0,
+  "task_groups": [
+    {
+      "id": 7,
+      "project_id": 12,
+      "title": "Backlog",
+      "description": null,
+      "status": 0,
+      "position": 1,
+      "tasks": [
+        {
+          "id": 103,
+          "title": "Escribir tests",
+          "description": null,
+          "status": 0,
+          "priority": 9,
+          "project_position": 4,
+          "group_position": 1,
+          "status_position": 2,
+          "date_start": null,
+          "date_end": "2026-12-01",
+          "hours_expected": "02:00:00",
+          "hours_inverted": null,
+          "assigned_to": null,
+          "assignees": [],
+          "comments_count": 0,
+          "medias_count": 0,
+          "updated_at": "2026-11-19 18:00:00"
+        }
+      ]
+    },
+    {
+      "id": 8,
+      "project_id": 12,
+      "title": "Hecho",
+      "description": "Cerradas",
+      "status": false,
+      "position": 2,
+      "tasks": []
+    }
+  ],
+  "users": [
+    {
+      "id": 3,
+      "name": "Ada Lovelace",
+      "avatar": "https://acme.mopux.com/media/ada.png"
+    },
+    {
+      "id": 5,
+      "name": "Bob",
+      "avatar": null
+    }
+  ],
+  "updated_at": "2026-11-20 10:15:00"
+}

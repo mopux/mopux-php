@@ -1,0 +1,17 @@
+{
+  "id": 13,
+  "title": "App móvil",
+  "description": null,
+  "status": -1,
+  "date_starts": null,
+  "date_ends": null,
+  "owner": {
+    "id": null,
+    "name": null,
+    "avatar": null
+  },
+  "users_count": 1,
+  "tasks_count": 0,
+  "done_count": 0,
+  "updated_at": "2026-11-01 08:00:00"
+}

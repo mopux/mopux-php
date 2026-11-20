@@ -1,0 +1,21 @@
+{
+  "id": 4,
+  "sender_id": 3,
+  "recipient_id": 5,
+  "task_id": 101,
+  "sender_message": "¿Cómo va?",
+  "recipient_message": null,
+  "status": "pending",
+  "sender": {
+    "id": 3,
+    "name": "Ada Lovelace",
+    "avatar": "https://acme.mopux.com/media/ada.png"
+  },
+  "recipient": {
+    "id": 5,
+    "name": "Bob",
+    "avatar": null
+  },
+  "created_at": "2026-11-20 10:00:00",
+  "updated_at": "2026-11-20 10:00:00"
+}

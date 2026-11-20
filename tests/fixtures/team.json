@@ -1,0 +1,17 @@
+{
+  "members": [
+    {
+      "id": 3,
+      "name": "Ada Lovelace",
+      "email": "ada@acme.test",
+      "avatar": null,
+      "is_active": true,
+      "roles": [
+        "admin"
+      ]
+    }
+  ],
+  "page": 1,
+  "last_page": 1,
+  "total": 1
+}
