@@ -23,3 +23,5 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `projects()` resource: list (with lazy `all()`), create, show, update, delete (slug confirmation), board (filters, archived groups excluded by default), activity, summary and members.
 - `taskGroups()` resource: create (with up to 4 tasks), reorder, reorderTasks, rename, archive, unarchive, move, copy, createProject, delete, focus and statusSummary.
 - `tasks()` resource: create, update, updateBatch, my, show, delete, updateStatus, updatePriority, assign, move (with warnings), updateTitle, updateDescription, updateStart, updateEnd, updateHours, sendTouch, focus/pinFocus/unpinFocus, moveOptions, attachments and markdownHelp.
+- `comments()` resource: list (with lazy `all()`), create (JSON, or multipart when files are attached), update, delete and reply.
+- `tasks()->uploadFile()` and `deleteFile()`; `Data\Input\Upload` (from path, string or stream) and a streaming multipart builder.

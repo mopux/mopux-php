@@ -8,6 +8,7 @@ use Mopux\Data\AuthToken;
 use Mopux\Http\Auth\TokenProvider;
 use Mopux\Http\Connector;
 use Mopux\Resources\Auth;
+use Mopux\Resources\Comments;
 use Mopux\Resources\Projects;
 use Mopux\Resources\TaskGroups;
 use Mopux\Resources\Tasks;
@@ -114,6 +115,11 @@ final class Mopux
     public function tasks(): Tasks
     {
         return new Tasks($this->connector);
+    }
+
+    public function comments(): Comments
+    {
+        return new Comments($this->connector);
     }
 
     private function withLastLogin(AuthToken $token): self

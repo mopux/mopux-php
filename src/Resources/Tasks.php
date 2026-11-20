@@ -12,6 +12,7 @@ use Mopux\Data\Input\Missing;
 use Mopux\Data\Input\TaskBatchUpdate;
 use Mopux\Data\Input\TaskCreate;
 use Mopux\Data\Input\TaskUpdate;
+use Mopux\Data\Input\Upload;
 use Mopux\Data\Input\Validate;
 use Mopux\Data\MarkdownHelp;
 use Mopux\Data\MovedTask;
@@ -24,6 +25,7 @@ use Mopux\Enums\TaskStatus;
 use Mopux\Exceptions\InvalidInputException;
 use Mopux\Exceptions\UncertainWriteException;
 use Mopux\Exceptions\ValidationException;
+use Mopux\Http\Multipart;
 use Mopux\Support\Payload;
 
 /**
@@ -223,6 +225,32 @@ final class Tasks extends Resource
         $response = $this->connector->get(self::path($taskId, 'attachments'), ['page' => $page, 'per_page' => $perPage]);
 
         return Paginated::fromPageFields($response->array(), 'attachments', Attachment::fromArray(...), $perPage);
+    }
+
+    /**
+     * Uploads a document to the task (multipart). The download URL in the result
+     * expires after 15 minutes.
+     */
+    public function uploadFile(int $taskId, Upload $file): Attachment
+    {
+        $multipart = (new Multipart)->file('file', $file);
+
+        $response = $this->connector->request(
+            'POST',
+            self::path($taskId, 'files'),
+            body: $multipart->build($this->connector->streamFactory()),
+            headers: ['Content-Type' => $multipart->contentType()],
+        );
+
+        return Attachment::fromArray($response->array());
+    }
+
+    /**
+     * Deletes a document the authenticated user uploaded to the task.
+     */
+    public function deleteFile(int $taskId, int $mediaId): void
+    {
+        $this->connector->delete(self::path($taskId, 'files/'.Validate::id($mediaId, 'media_id')));
     }
 
     /**
