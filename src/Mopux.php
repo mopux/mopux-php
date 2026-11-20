@@ -8,6 +8,8 @@ use Mopux\Data\AuthToken;
 use Mopux\Http\Auth\TokenProvider;
 use Mopux\Http\Connector;
 use Mopux\Resources\Auth;
+use Mopux\Resources\Projects;
+use Mopux\Resources\TaskGroups;
 use Psr\Http\Client\ClientInterface;
 
 /**
@@ -96,6 +98,16 @@ final class Mopux
     public function auth(): Auth
     {
         return new Auth($this->connector);
+    }
+
+    public function projects(): Projects
+    {
+        return new Projects($this->connector);
+    }
+
+    public function taskGroups(): TaskGroups
+    {
+        return new TaskGroups($this->connector);
     }
 
     private function withLastLogin(AuthToken $token): self
