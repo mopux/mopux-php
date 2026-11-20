@@ -30,5 +30,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Laravel integration: auto-discovered `MopuxServiceProvider`, publishable `config/mopux.php` (`MOPUX_URL`, `MOPUX_TOKEN`, timeouts, retries), `Mopux` facade and `Mopux::fake()` with request assertions (also fakes clients injected by type and tenant clients).
 - Integration suite (`composer test:integration`) running the whole API flow against a real tenant inside a throwaway project.
 
+### Documentation
+- README covering installation, authentication (tokens, OAuth refresh, multi-tenant), resources, inputs, uploads, pagination, errors, retries, Laravel and testing; SECURITY.md.
+
 ### Fixed
 - `ProjectStatistics::$unassigned` is an `UnassignedTasks` object (`total`, `pending`, `completed`) and `$multipleAssignees` a boolean, as returned by the API.
