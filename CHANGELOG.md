@@ -26,3 +26,4 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `comments()` resource: list (with lazy `all()`), create (JSON, or multipart when files are attached), update, delete and reply.
 - `tasks()->uploadFile()` and `deleteFile()`; `Data\Input\Upload` (from path, string or stream) and a streaming multipart builder.
 - `notifications()` (list, all, markRead, markUnread, markAllRead, unreadCount, delete, deleteAll), `touches()` (list, reply), `team()` (list, all) and `teamInvitations()` (list, create, resend, delete) resources.
+- Contract test (`composer test:contract`): every operation of `resources/openapi.yaml` (69) maps to an SDK call that hits the right method and path; `composer sync-spec` refreshes the spec.

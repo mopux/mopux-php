@@ -24,7 +24,8 @@ composer test       # Pest
 composer analyse    # PHPStan (level max)
 composer lint       # Pint (check only)
 composer check      # all of the above
-composer sync-spec  # refresh resources/openapi.yaml from the Mopux repository
+composer sync-spec  # refresh resources/openapi.yaml (or: composer sync-spec -- /path/to/openapi-v1-public.yaml)
+composer test:contract  # every spec operation must map to an SDK method
 ```
 
 ## License
