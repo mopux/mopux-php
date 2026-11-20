@@ -10,6 +10,7 @@ use Mopux\Http\Connector;
 use Mopux\Resources\Auth;
 use Mopux\Resources\Projects;
 use Mopux\Resources\TaskGroups;
+use Mopux\Resources\Tasks;
 use Psr\Http\Client\ClientInterface;
 
 /**
@@ -108,6 +109,11 @@ final class Mopux
     public function taskGroups(): TaskGroups
     {
         return new TaskGroups($this->connector);
+    }
+
+    public function tasks(): Tasks
+    {
+        return new Tasks($this->connector);
     }
 
     private function withLastLogin(AuthToken $token): self

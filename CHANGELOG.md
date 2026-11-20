@@ -22,3 +22,4 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `Data\Paginated<T>` for the three list shapes of the API (Laravel `data/links/meta`, page fields and plain lists) with `hasMorePages()`, `nextPage()` and lazy `Paginated::iterate()`.
 - `projects()` resource: list (with lazy `all()`), create, show, update, delete (slug confirmation), board (filters, archived groups excluded by default), activity, summary and members.
 - `taskGroups()` resource: create (with up to 4 tasks), reorder, reorderTasks, rename, archive, unarchive, move, copy, createProject, delete, focus and statusSummary.
+- `tasks()` resource: create, update, updateBatch, my, show, delete, updateStatus, updatePriority, assign, move (with warnings), updateTitle, updateDescription, updateStart, updateEnd, updateHours, sendTouch, focus/pinFocus/unpinFocus, moveOptions, attachments and markdownHelp.
