@@ -9,9 +9,13 @@ use Mopux\Http\Auth\TokenProvider;
 use Mopux\Http\Connector;
 use Mopux\Resources\Auth;
 use Mopux\Resources\Comments;
+use Mopux\Resources\Notifications;
 use Mopux\Resources\Projects;
 use Mopux\Resources\TaskGroups;
 use Mopux\Resources\Tasks;
+use Mopux\Resources\Team;
+use Mopux\Resources\TeamInvitations;
+use Mopux\Resources\Touches;
 use Psr\Http\Client\ClientInterface;
 
 /**
@@ -120,6 +124,26 @@ final class Mopux
     public function comments(): Comments
     {
         return new Comments($this->connector);
+    }
+
+    public function notifications(): Notifications
+    {
+        return new Notifications($this->connector);
+    }
+
+    public function touches(): Touches
+    {
+        return new Touches($this->connector);
+    }
+
+    public function team(): Team
+    {
+        return new Team($this->connector);
+    }
+
+    public function teamInvitations(): TeamInvitations
+    {
+        return new TeamInvitations($this->connector);
     }
 
     private function withLastLogin(AuthToken $token): self
