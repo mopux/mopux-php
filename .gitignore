@@ -6,3 +6,4 @@ composer.lock
 .env
 .idea/
 .vscode/
+tests/Integration/.env

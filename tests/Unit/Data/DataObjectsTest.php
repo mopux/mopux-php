@@ -134,8 +134,10 @@ it('hydrates project statistics', function (): void {
         ->and($statistics->groups[0]->counts->delayed)->toBe(2)
         ->and($statistics->people[0]->user->id)->toBe(3)
         ->and($statistics->people[0]->pending)->toBe(9)
+        ->and($statistics->unassigned->total)->toBe(4)
+        ->and($statistics->unassigned->pending)->toBe(3)
         ->and($statistics->withoutTasks)->toBe(1)
-        ->and($statistics->multipleAssignees)->toBe(2);
+        ->and($statistics->multipleAssignees)->toBeTrue();
 });
 
 it('hydrates activity entries', function (): void {

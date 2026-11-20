@@ -9,6 +9,9 @@ use Mopux\Support\Payload;
 
 /**
  * Progress and workload of a project (`GET projects/{id}/summary`).
+ *
+ * `withoutTasks` counts members with no tasks; `multipleAssignees` tells whether
+ * some task has more than one assignee.
  */
 final class ProjectStatistics implements DataObject
 {
@@ -24,9 +27,9 @@ final class ProjectStatistics implements DataObject
         public readonly int $progress,
         public readonly array $groups,
         public readonly array $people,
-        public readonly int $unassigned,
+        public readonly UnassignedTasks $unassigned,
         public readonly int $withoutTasks,
-        public readonly int $multipleAssignees,
+        public readonly bool $multipleAssignees,
     ) {}
 
     public static function fromArray(array $data): static
@@ -41,9 +44,9 @@ final class ProjectStatistics implements DataObject
             progress: $payload->int('progress'),
             groups: $payload->list('groups', GroupStatistics::fromArray(...)),
             people: $payload->list('people', PersonWorkload::fromArray(...)),
-            unassigned: $payload->nullableInt('unassigned') ?? 0,
+            unassigned: UnassignedTasks::fromArray($payload->array('unassigned')),
             withoutTasks: $payload->nullableInt('without_tasks') ?? 0,
-            multipleAssignees: $payload->nullableInt('multiple_assignees') ?? 0,
+            multipleAssignees: $payload->nullableBool('multiple_assignees') ?? false,
         );
     }
 
@@ -57,7 +60,7 @@ final class ProjectStatistics implements DataObject
             'progress' => $this->progress,
             'groups' => Format::list($this->groups),
             'people' => Format::list($this->people),
-            'unassigned' => $this->unassigned,
+            'unassigned' => $this->unassigned->toArray(),
             'without_tasks' => $this->withoutTasks,
             'multiple_assignees' => $this->multipleAssignees,
         ];

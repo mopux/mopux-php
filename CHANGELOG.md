@@ -28,3 +28,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `notifications()` (list, all, markRead, markUnread, markAllRead, unreadCount, delete, deleteAll), `touches()` (list, reply), `team()` (list, all) and `teamInvitations()` (list, create, resend, delete) resources.
 - Contract test (`composer test:contract`): every operation of `resources/openapi.yaml` (69) maps to an SDK call that hits the right method and path; `composer sync-spec` refreshes the spec.
 - Laravel integration: auto-discovered `MopuxServiceProvider`, publishable `config/mopux.php` (`MOPUX_URL`, `MOPUX_TOKEN`, timeouts, retries), `Mopux` facade and `Mopux::fake()` with request assertions (also fakes clients injected by type and tenant clients).
+- Integration suite (`composer test:integration`) running the whole API flow against a real tenant inside a throwaway project.
+
+### Fixed
+- `ProjectStatistics::$unassigned` is an `UnassignedTasks` object (`total`, `pending`, `completed`) and `$multipleAssignees` a boolean, as returned by the API.

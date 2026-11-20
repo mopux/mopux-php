@@ -35,7 +35,11 @@
       "completed": 3
     }
   ],
-  "unassigned": 4,
+  "unassigned": {
+    "total": 4,
+    "pending": 3,
+    "completed": 1
+  },
   "without_tasks": 1,
-  "multiple_assignees": 2
+  "multiple_assignees": true
 }
