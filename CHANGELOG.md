@@ -11,3 +11,5 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Package scaffold: Composer metadata, Pest, PHPStan (level max), Pint and CI matrix.
 - `Config` and `Http\Connector`: PSR-18 transport against `/api/v1/`, envelope unwrapping and query building.
 - Exception hierarchy mapped from HTTP statuses (401, 403, 404, 422, 429, 4xx, 5xx) with `UncertainWriteException` for failed writes.
+- `Http\RetryPolicy` (enabled by default, 2 retries): 429 for every method honouring `Retry-After`; network errors and 5xx only for GET/HEAD/OPTIONS. Writes are never retried after an uncertain failure.
+- `Testing\MockClient`, `MockResponse`, `RecordedRequest` and `NetworkError` to fake the API in tests, with `assertSent()`, `assertNotSent()`, `assertSentCount()` and `assertNothingSent()`.

@@ -13,6 +13,7 @@ use Mopux\Exceptions\MopuxException;
 use Mopux\Version;
 use Psr\Http\Client\ClientExceptionInterface;
 use Psr\Http\Client\ClientInterface;
+use Psr\Http\Client\NetworkExceptionInterface;
 use Psr\Http\Message\RequestFactoryInterface;
 use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
@@ -128,14 +129,54 @@ final class Connector
         $method = strtoupper($method);
         $path = ltrim($path, '/');
         $request = $this->buildRequest($method, $path, $query, $json, $body, $headers);
+        $retry = $this->config->retry;
 
-        try {
-            $response = $this->client->sendRequest($request);
-        } catch (ClientExceptionInterface $exception) {
-            throw new ConnectionException($method, $path, $exception);
+        for ($attempt = 0; ; $attempt++) {
+            try {
+                $response = $this->client->sendRequest($request);
+            } catch (ClientExceptionInterface $exception) {
+                $delay = $exception instanceof NetworkExceptionInterface && $this->canResend($request)
+                    ? $retry->delayAfterConnectionError($method, $attempt)
+                    : null;
+
+                if ($delay === null) {
+                    throw new ConnectionException($method, $path, $exception);
+                }
+
+                $retry->sleep($delay);
+                $this->rewind($request);
+
+                continue;
+            }
+
+            $delay = $this->canResend($request)
+                ? $retry->delayAfterResponse($method, $response->getStatusCode(), $response->getHeaderLine('Retry-After'), $attempt)
+                : null;
+
+            if ($delay === null) {
+                return $this->handle($method, $path, $response);
+            }
+
+            $retry->sleep($delay);
+            $this->rewind($request);
         }
+    }
 
-        return $this->handle($method, $path, $response);
+    private function rewind(RequestInterface $request): void
+    {
+        if ($request->getBody()->isSeekable()) {
+            $request->getBody()->rewind();
+        }
+    }
+
+    /**
+     * A request can be sent again when it has no body or its body can be rewound.
+     */
+    private function canResend(RequestInterface $request): bool
+    {
+        $body = $request->getBody();
+
+        return $body->isSeekable() || $body->getSize() === 0;
     }
 
     /**

@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Mopux;
 
 use InvalidArgumentException;
+use Mopux\Http\RetryPolicy;
 
 /**
  * Immutable client configuration.
@@ -23,6 +24,7 @@ final class Config
         public readonly float $timeout = 30.0,
         public readonly float $connectTimeout = 10.0,
         public readonly ?string $userAgent = null,
+        public readonly RetryPolicy $retry = new RetryPolicy,
     ) {
         $this->baseUrl = self::normalizeBaseUrl($baseUrl);
 
@@ -37,22 +39,27 @@ final class Config
 
     public function withBaseUrl(string $baseUrl): self
     {
-        return new self($baseUrl, $this->token, $this->timeout, $this->connectTimeout, $this->userAgent);
+        return new self($baseUrl, $this->token, $this->timeout, $this->connectTimeout, $this->userAgent, $this->retry);
     }
 
     public function withToken(?string $token): self
     {
-        return new self($this->baseUrl, $token, $this->timeout, $this->connectTimeout, $this->userAgent);
+        return new self($this->baseUrl, $token, $this->timeout, $this->connectTimeout, $this->userAgent, $this->retry);
     }
 
     public function withTimeouts(float $timeout, float $connectTimeout): self
     {
-        return new self($this->baseUrl, $this->token, $timeout, $connectTimeout, $this->userAgent);
+        return new self($this->baseUrl, $this->token, $timeout, $connectTimeout, $this->userAgent, $this->retry);
     }
 
     public function withUserAgent(?string $userAgent): self
     {
-        return new self($this->baseUrl, $this->token, $this->timeout, $this->connectTimeout, $userAgent);
+        return new self($this->baseUrl, $this->token, $this->timeout, $this->connectTimeout, $userAgent, $this->retry);
+    }
+
+    public function withRetry(RetryPolicy $retry): self
+    {
+        return new self($this->baseUrl, $this->token, $this->timeout, $this->connectTimeout, $this->userAgent, $retry);
     }
 
     /**
