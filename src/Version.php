@@ -9,7 +9,7 @@ namespace Mopux;
  */
 final class Version
 {
-    public const SDK = '0.1.0';
+    public const SDK = '0.1.1';
 
     /**
      * API version targeted by this client (matches `/api/v1`).

@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.1] - 2026-11-21
+
 ### Changed
 - Exception messages include the details the API returns besides `message`: `data.error` when it adds the reason, and the 422 field errors not already in the message.
 
@@ -39,5 +41,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Documentation
 - README covering installation, authentication (tokens, OAuth refresh, multi-tenant), resources, inputs, uploads, pagination, errors, retries, Laravel and testing; SECURITY.md.
 
-[Unreleased]: https://github.com/mopux/mopux-php/compare/v0.1.0...HEAD
+[Unreleased]: https://github.com/mopux/mopux-php/compare/v0.1.1...HEAD
+[0.1.1]: https://github.com/mopux/mopux-php/compare/v0.1.0...v0.1.1
 [0.1.0]: https://github.com/mopux/mopux-php/releases/tag/v0.1.0
