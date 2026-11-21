@@ -1,7 +1,10 @@
 openapi: 3.1.0
 info:
   title: Mopux Public API v1
-  version: 1.1.1
+  version: 1.1.2
+  license:
+    name: Propietaria. Uso sujeto a las condiciones de Mopux
+    url: https://mopux.com/es/legal/terms
   description: |
     Versión pública y simplificada de la API v1 de Mopux.
 
@@ -21,22 +24,31 @@ info:
     - Las horas se envían como `HH:MM` y se devuelven como `HH:MM:SS`; `null` borra descripción, fechas u horas; `assignees` es `{operation, user_ids}`; `status` `-1` es de solo lectura.
 servers:
   - url: https://{tenant_domain}
+    description: Dominio de tu instalación de Mopux
     variables:
       tenant_domain:
-        default: mopux.web-mopux-2025.test
+        default: acme.mopux.com
 
 security:
   - bearerAuth: []
 
 tags:
   - name: Auth
+    description: Login con email y contraseña, logout y usuario del token.
   - name: Projects
+    description: Proyectos, su board, actividad, resumen y miembros, y los grupos de tareas.
   - name: Tasks
+    description: Tareas, sus campos, foco personal, documentos y toques.
   - name: Comments
+    description: Comentarios y respuestas de las tareas, con menciones y adjuntos.
   - name: Notifications
+    description: Notificaciones del usuario autenticado.
   - name: Touches
+    description: Toques recibidos y enviados entre miembros de un proyecto.
   - name: Team
+    description: Personas de la instalación.
   - name: Team Invitations
+    description: Invitaciones para unirse al equipo.
 
 
 paths:
@@ -383,7 +395,7 @@ paths:
       operationId: tasksAttachments
       tags: [Tasks]
       summary: Adjuntos de la tarea
-      description: Archivos únicos adjuntos a la tarea o a sus comentarios, con un enlace de descarga firmado válido 15 minutos y los comentarios en los que aparecen. Misma consulta que la tool MCP list_task_attachments.
+      description: Archivos únicos adjuntos a la tarea o a sus comentarios, con un enlace de descarga firmado válido 15 minutos y los comentarios en los que aparecen.
       parameters:
         - in: path
           name: taskId
@@ -1012,6 +1024,8 @@ paths:
               properties:
                 groups:
                   type: array
+                  minItems: 1
+                  description: Sin IDs repetidos (422 si se repite alguno o no pertenece al proyecto).
                   items:
                     type: object
                     required: [value, order]
@@ -1512,6 +1526,8 @@ paths:
               properties:
                 tasks:
                   type: array
+                  minItems: 1
+                  description: Sin IDs repetidos (422 si se repite alguno o no pertenece al grupo).
                   items:
                     type: object
                     required: [value, order]
@@ -2927,12 +2943,12 @@ components:
               title: one.txt
               type: dwn
               mimetype: text/plain
-              url: https://mopux.web-mopux-2025.test/uploads/...
+              url: https://acme.mopux.com/uploads/...
             - id: 102
               title: two.txt
               type: dwn
               mimetype: text/plain
-              url: https://mopux.web-mopux-2025.test/uploads/...
+              url: https://acme.mopux.com/uploads/...
           replies_count: 0
           created_at: '2026-02-25 11:00:00'
           updated_at: '2026-02-25 11:00:00'
@@ -3308,6 +3324,7 @@ components:
 
     TaskCreateInput:
       type: object
+      description: 'Limitación actual: los campos no documentados se ignoran sin error (actualizar una tarea sí los rechaza con 422).'
       required: [project_id, group_id, title]
       additionalProperties: false
       properties:
@@ -3361,7 +3378,7 @@ components:
       type: object
       minProperties: 1
       additionalProperties: false
-      description: Los mismos campos que PATCH /api/v1/tasks/{taskId}, más el movimiento a otro grupo (task_group_id) o a otro proyecto (destination_project_id junto con task_group_id), como en la tool MCP update_tasks.
+      description: Los mismos campos que PATCH /api/v1/tasks/{taskId}, más el movimiento a otro grupo (task_group_id) o a otro proyecto (destination_project_id junto con task_group_id).
       properties:
         title: { type: string, maxLength: 255 }
         description: { type: [string, 'null'] }
