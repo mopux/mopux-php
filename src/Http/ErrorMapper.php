@@ -55,15 +55,20 @@ final class ErrorMapper
     }
 
     /**
+     * The API message followed by the details it carries elsewhere: `data.error` when it adds
+     * something (e.g. the reason behind a generic "Forbidden") and, for 422, the field errors
+     * not already included in the message.
+     *
      * @param  array<array-key, mixed>|null  $body
      */
     private static function message(int $status, ResponseInterface $response, ?array $body): string
     {
         $message = $body['message'] ?? null;
+        $data = is_array($body['data'] ?? null) ? $body['data'] : [];
+        $error = is_string($data['error'] ?? null) && trim($data['error']) !== '' ? trim($data['error']) : null;
 
         if (! is_string($message) || trim($message) === '') {
-            $data = $body['data'] ?? null;
-            $message = is_array($data) ? ($data['error'] ?? null) : null;
+            $message = $error;
         }
 
         if (! is_string($message) || trim($message) === '') {
@@ -71,6 +76,35 @@ final class ErrorMapper
             $message = $reason !== '' ? $reason : 'Mopux API error';
         }
 
+        $message = trim($message);
+        $details = $status === 422 ? self::validationMessages($data['errors'] ?? null) : array_filter([$error]);
+
+        foreach (array_unique($details) as $detail) {
+            if (! str_contains($message, $detail)) {
+                $message .= ' '.$detail;
+            }
+        }
+
         return sprintf('%s (HTTP %d)', $message, $status);
+    }
+
+    /**
+     * @return list<string>
+     */
+    private static function validationMessages(mixed $errors): array
+    {
+        if (! is_array($errors)) {
+            return [];
+        }
+
+        $messages = [];
+
+        array_walk_recursive($errors, static function (mixed $value) use (&$messages): void {
+            if (is_string($value) && trim($value) !== '') {
+                $messages[] = trim($value);
+            }
+        });
+
+        return $messages;
     }
 }

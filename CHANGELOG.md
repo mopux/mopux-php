@@ -7,6 +7,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+- Exception messages include the details the API returns besides `message`: `data.error` when it adds the reason, and the 422 field errors not already in the message.
+
 ## [0.1.0] - 2026-11-21
 
 ### Added

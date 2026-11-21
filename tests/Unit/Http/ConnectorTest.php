@@ -124,6 +124,8 @@ it('maps http error statuses to exceptions', function (int $status, string $meth
     '500 post' => [500, 'POST', UncertainWriteException::class, ['message' => 'Server Error'], 'Server Error (HTTP 500)'],
     '502 patch' => [502, 'PATCH', UncertainWriteException::class, '', 'Bad Gateway (HTTP 502)'],
     '500 delete' => [500, 'DELETE', UncertainWriteException::class, ['message' => 'Server Error'], 'Server Error (HTTP 500)'],
+    '403 with reason in data.error' => [403, 'POST', AuthorizationException::class, ['success' => false, 'message' => 'Forbidden.', 'data' => ['error' => 'You cannot comment on this task.']], 'Forbidden. You cannot comment on this task. (HTTP 403)'],
+    '422 with several errors' => [422, 'POST', ValidationException::class, ['success' => false, 'message' => 'The title field is required. (and 1 more error)', 'data' => ['error' => 'Validation failed.', 'errors' => ['title' => ['The title field is required.'], 'group_id' => ['The group is archived.']]]], 'The title field is required. (and 1 more error) The group is archived. (HTTP 422)'],
 ]);
 
 it('explains that a failed write has an uncertain outcome', function (): void {
