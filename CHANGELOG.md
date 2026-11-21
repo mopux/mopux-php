@@ -7,8 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.0] - 2026-11-21
+
 ### Added
 - Package scaffold: Composer metadata, Pest, PHPStan (level max), Pint and CI matrix.
+- Composer conflict with `http-interop/http-factory-guzzle` < 1.0, whose factories predate PSR-17.
 - `Config` and `Http\Connector`: PSR-18 transport against `/api/v1/`, envelope unwrapping and query building.
 - Exception hierarchy mapped from HTTP statuses (401, 403, 404, 422, 429, 4xx, 5xx) with `UncertainWriteException` for failed writes.
 - `Http\RetryPolicy` (enabled by default, 2 retries): 429 for every method honouring `Retry-After`; network errors and 5xx only for GET/HEAD/OPTIONS. Writes are never retried after an uncertain failure.
@@ -33,6 +36,5 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Documentation
 - README covering installation, authentication (tokens, OAuth refresh, multi-tenant), resources, inputs, uploads, pagination, errors, retries, Laravel and testing; SECURITY.md.
 
-### Fixed
-- `ProjectStatistics::$unassigned` is an `UnassignedTasks` object (`total`, `pending`, `completed`) and `$multipleAssignees` a boolean, as returned by the API.
-- Conflict with `http-interop/http-factory-guzzle` < 1.0: its factories predate PSR-17 and broke discovery with `guzzlehttp/psr7` 1.x.
+[Unreleased]: https://github.com/mopux/mopux-php/compare/v0.1.0...HEAD
+[0.1.0]: https://github.com/mopux/mopux-php/releases/tag/v0.1.0
