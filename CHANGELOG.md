@@ -35,3 +35,4 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 - `ProjectStatistics::$unassigned` is an `UnassignedTasks` object (`total`, `pending`, `completed`) and `$multipleAssignees` a boolean, as returned by the API.
+- Conflict with `http-interop/http-factory-guzzle` < 1.0: its factories predate PSR-17 and broke discovery with `guzzlehttp/psr7` 1.x.
