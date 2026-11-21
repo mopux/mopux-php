@@ -48,6 +48,9 @@ jobs:
           coverage: none
       - name: Install dependencies
         run: |
+          # Laravel 11 is end-of-life and every release has open advisories; the package itself
+          # does not require Laravel, so we keep checking compatibility without blocking on them.
+          if [ "${{ matrix.laravel }}" = "11.*" ]; then composer config policy.advisories.block false; fi
           composer require "laravel/framework:${{ matrix.laravel }}" "orchestra/testbench:${{ matrix.testbench }}" --dev --no-interaction --no-update
           composer update --${{ matrix.stability }} --prefer-dist --no-interaction --no-progress
       - run: composer test
