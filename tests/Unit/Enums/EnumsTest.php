@@ -66,7 +66,8 @@ it('matches the spec', function (string $enum, array $expected): void {
 })->with([
     'task priority' => fn () => [TaskPriority::class, openapi()['components']['schemas']['TaskPriority']['enum']],
     'assignee operation' => fn () => [AssigneeOperation::class, openapi()['components']['schemas']['AssigneeMutation']['properties']['operation']['enum']],
-    'project status' => fn () => [ProjectStatus::class, openapi()['paths']['/api/v1/projects/{projectId}']['patch']['requestBody']['content']['application/json']['schema']['properties']['status']['enum']],
+    'project status' => fn () => [ProjectStatus::class, openapi()['components']['schemas']['ProjectStatus']['enum']],
+    'task status (read)' => fn () => [TaskStatus::class, openapi()['components']['schemas']['TaskStatusRead']['enum']],
     'activity filter' => fn () => [ActivityFilter::class, queryEnum('/api/v1/projects/{projectId}/activity', 'get', 'filter')],
     'notification filter' => fn () => [NotificationFilter::class, queryEnum('/api/v1/notifications', 'get', 'filter')],
     'touch box' => fn () => [TouchBox::class, queryEnum('/api/v1/touches', 'get', 'box')],
