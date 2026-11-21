@@ -12,7 +12,7 @@ Official PHP client for the [Mopux](https://www.mopux.com) API (`/api/v1`), with
 
 - PHP 8.2+
 - A PSR-18 client and PSR-17 factories (`guzzlehttp/guzzle` covers both)
-- Laravel 11, 12 or 13 (optional; Laravel 11 no longer gets security fixes, prefer 12+)
+- Laravel 12 or 13 (optional). Only Laravel versions that still receive security fixes are supported; installing on older ones is blocked.
 
 ## Installation
 

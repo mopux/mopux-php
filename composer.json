@@ -32,13 +32,14 @@
         "guzzlehttp/guzzle": "^7.8",
         "guzzlehttp/psr7": "^2.6",
         "laravel/pint": "^1.18",
-        "orchestra/testbench": "^9.0|^10.0|^11.0",
+        "orchestra/testbench": "^10.0|^11.0",
         "pestphp/pest": "^3.0|^4.0",
         "phpstan/phpstan": "^2.0",
         "symfony/yaml": "^7.0|^8.0"
     },
     "conflict": {
-        "http-interop/http-factory-guzzle": "<1.0"
+        "http-interop/http-factory-guzzle": "<1.0",
+        "laravel/framework": "<12.0"
     },
     "suggest": {
         "guzzlehttp/guzzle": "PSR-18 HTTP client used by default when available.",
