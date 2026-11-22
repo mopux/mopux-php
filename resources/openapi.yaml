@@ -12,7 +12,8 @@ info:
     - Base path: `/api/v1`
     - Auth: Bearer token (Sanctum u OAuth cuando está habilitado)
     - OAuth requiere mopux:read para lecturas y mopux:write para escrituras (logout no requiere scope).
-    - Errores: todas las respuestas de error usan `{success: false, message, data: {error, code?, errors?}}`, también el 401, el 429 y el 403 por bloqueo de facturación. `data.code` es un código estable para máquinas cuando el caso lo tiene (por ejemplo `billing_access_blocked`); en 422 los mensajes por campo van en `data.errors.{campo}`. Un fallo inesperado responde 500 con `message: Server Error.` y nunca incluye detalles internos.
+    - Errores: todas las respuestas de error usan `{success: false, message, data: {error, code?, errors?}}`, también el 401, el 429 y el 403 por bloqueo de facturación. `data.code` es un código estable para máquinas cuando el caso lo tiene (por ejemplo `billing_access_blocked` o `plan_feature_unavailable`); en 422 los mensajes por campo van en `data.errors.{campo}`. Un fallo inesperado responde 500 con `message: Server Error.` y nunca incluye detalles internos.
+    - Plan: la API v1 forma parte del plan contratado. Si el plan de la instalación no la incluye, el login y cualquier token existente responden 403 con `data.code: plan_feature_unavailable` y `data.feature: api`. Los tokens no se borran: vuelven a funcionar si cambia el plan. El logout sigue disponible.
     - Límite de peticiones: 30/min en `auth/login` y 120/min en el resto; al superarlo responde 429 con `Retry-After` (segundos).
     - En `multipart/form-data`, los arrays van con una parte por elemento y nombre con corchetes: `files[]`, `mentions[]`, `media_ids[]`.
     - Paginación: Laravel `data/links/meta` (proyectos, actividad, invitaciones), campos de página en el objeto (`team`, adjuntos) o listas sin metadatos (comentarios, notificaciones). `tasks/my` no está paginado. Las páginas se piden con `page`.
@@ -58,7 +59,7 @@ paths:
       tags: [Auth]
       security: []
       summary: Login y emisión de token
-      description: Devuelve un token personal (`id|secret`) que solo se muestra una vez. Credenciales incorrectas devuelven 401 (`Unauthorised.`); un usuario sin el permiso de uso de la API devuelve 403.
+      description: 'Devuelve un token personal (`id|secret`) que solo se muestra una vez. Credenciales incorrectas devuelven 401 (`Unauthorised.`). Si el plan de la instalación no incluye la API responde 403 con `data.code: plan_feature_unavailable` y no emite el token; un usuario sin el permiso de uso de la API devuelve 403.'
       requestBody:
         required: true
         content:
@@ -2833,7 +2834,7 @@ components:
               error: Unauthenticated.
 
     Error403:
-      description: 'Prohibido: falta permiso (incluido el permiso de uso de la API), el scope OAuth (`mopux:read` para lecturas, `mopux:write` para escrituras) o el acceso está bloqueado por facturación (`data.code: billing_access_blocked`).'
+      description: 'Prohibido: falta permiso (incluido el permiso de uso de la API), el scope OAuth (`mopux:read` para lecturas, `mopux:write` para escrituras) el acceso está bloqueado por facturación (`data.code: billing_access_blocked`) o el plan de la instalación no incluye la API (`data.code: plan_feature_unavailable`, con `data.feature`).'
       content:
         application/json:
           schema:
@@ -2852,6 +2853,14 @@ components:
                 data:
                   error: Operations are blocked until the subscription is regularised. The representative can still access billing and export.
                   code: billing_access_blocked
+            planFeatureUnavailable:
+              value:
+                success: false
+                message: Your plan does not include API access. Switch to a plan with API access to use it.
+                data:
+                  error: Your plan does not include API access. Switch to a plan with API access to use it.
+                  code: plan_feature_unavailable
+                  feature: api
 
     Error404:
       description: Recurso no encontrado
@@ -3142,9 +3151,12 @@ components:
           properties:
             error:
               type: string
+            feature:
+              type: string
+              description: 'Funcionalidad que falta en el plan, solo con `code: plan_feature_unavailable`. Valores actuales: `api`.'
             code:
               type: string
-              description: 'Código estable para máquinas, solo en los casos que lo tienen. Valores actuales: `billing_access_blocked` (403, la instalación está bloqueada por facturación o la prueba ha terminado). Trata un código desconocido como un error genérico de su estado HTTP.'
+              description: 'Código estable para máquinas, solo en los casos que lo tienen. Valores actuales: `billing_access_blocked` (403, la instalación está bloqueada por facturación o la prueba ha terminado) y `plan_feature_unavailable` (403, el plan contratado no incluye la funcionalidad indicada en `feature`; hoy solo `api`). Trata un código desconocido como un error genérico de su estado HTTP.'
             errors:
               type: object
               description: Solo en 422. Mensajes por campo.
