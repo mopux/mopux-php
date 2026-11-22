@@ -1,7 +1,7 @@
 openapi: 3.1.0
 info:
   title: Mopux Public API v1
-  version: 1.1.2
+  version: 1.2.0
   license:
     name: Propietaria. Uso sujeto a las condiciones de Mopux
     url: https://mopux.com/es/legal/terms
@@ -12,7 +12,7 @@ info:
     - Base path: `/api/v1`
     - Auth: Bearer token (Sanctum u OAuth cuando está habilitado)
     - OAuth requiere mopux:read para lecturas y mopux:write para escrituras (logout no requiere scope).
-    - Errores: `{success: false, message, data: {error, errors?}}`; en 422 los mensajes por campo van en `data.errors.{campo}`. El 429 y el 403 por bloqueo de facturación devuelven solo `{message}` o `{success, message}`, sin `data`.
+    - Errores: todas las respuestas de error usan `{success: false, message, data: {error, code?, errors?}}`, también el 401, el 429 y el 403 por bloqueo de facturación. `data.code` es un código estable para máquinas cuando el caso lo tiene (por ejemplo `billing_access_blocked`); en 422 los mensajes por campo van en `data.errors.{campo}`. Un fallo inesperado responde 500 con `message: Server Error.` y nunca incluye detalles internos.
     - Límite de peticiones: 30/min en `auth/login` y 120/min en el resto; al superarlo responde 429 con `Retry-After` (segundos).
     - En `multipart/form-data`, los arrays van con una parte por elemento y nombre con corchetes: `files[]`, `mentions[]`, `media_ids[]`.
     - Paginación: Laravel `data/links/meta` (proyectos, actividad, invitaciones), campos de página en el objeto (`team`, adjuntos) o listas sin metadatos (comentarios, notificaciones). `tasks/my` no está paginado. Las páginas se piden con `page`.
@@ -469,6 +469,7 @@ paths:
         '403': { $ref: '#/components/responses/Error403' }
         '404': { $ref: '#/components/responses/Error404' }
         '422': { $ref: '#/components/responses/Error422' }
+        '409': { $ref: '#/components/responses/Error409' }
         '429': { $ref: '#/components/responses/Error429' }
 
   /api/v1/tasks/{taskId}/files/{mediaId}:
@@ -476,7 +477,7 @@ paths:
       operationId: tasksDeleteFile
       tags: [Tasks]
       summary: Borrar un documento de la tarea
-      description: Borra el documento de la tarea y de sus comentarios, y el archivo físico si nada más lo usa. Requiere permiso para borrar archivos (propietario del archivo, o admin o gestor de proyectos miembro de los proyectos que lo usan). Si el documento no pertenece a la tarea responde 403.
+      description: Borra el documento de la tarea y de sus comentarios, y el archivo físico si nada más lo usa. Requiere permiso para borrar archivos (propietario del archivo, o admin o gestor de proyectos miembro de los proyectos que lo usan). Si el documento no pertenece a la tarea responde 404.
       parameters:
         - in: path
           name: taskId
@@ -824,7 +825,7 @@ paths:
       operationId: projectsAddMember
       tags: [Projects]
       summary: Añadir un miembro al proyecto
-      description: 'Requiere poder gestionar el proyecto. El usuario debe existir y estar activo. Devuelve el equipo actualizado. Limitación actual: si el proyecto tiene algún miembro desactivado, la operación devuelve 422 (`errors.members`).'
+      description: 'Requiere poder gestionar el proyecto. El usuario debe existir y estar activo. Devuelve el equipo actualizado. Los miembros que se desactivaron después de entrar en el proyecto se mantienen; solo se valida el usuario que se añade.'
       parameters:
         - $ref: '#/components/parameters/projectId'
       requestBody:
@@ -863,7 +864,7 @@ paths:
       operationId: projectsRemoveMember
       tags: [Projects]
       summary: Quitar un miembro del proyecto
-      description: 'Requiere poder gestionar el proyecto. No se puede quitar al propietario ni a uno mismo (422). Las tareas del miembro siguen en el proyecto. Quitar a alguien que no es miembro no hace nada y devuelve 200. Limitación actual: si el proyecto tiene algún miembro desactivado, la operación devuelve 422 (`errors.members`).'
+      description: 'Requiere poder gestionar el proyecto. No se puede quitar al propietario ni a uno mismo (422). Las tareas del miembro siguen en el proyecto. Quitar a alguien que no es miembro no hace nada y devuelve 200. Los miembros que se desactivaron después de entrar en el proyecto se mantienen; solo se valida el usuario que se añade.'
       parameters:
         - $ref: '#/components/parameters/projectId'
         - in: path
@@ -1025,7 +1026,7 @@ paths:
                 groups:
                   type: array
                   minItems: 1
-                  description: Sin IDs repetidos (422 si se repite alguno o no pertenece al proyecto).
+                  description: Sin IDs repetidos (422 con `data.errors.groups` si se repite alguno o no pertenece al proyecto).
                   items:
                     type: object
                     required: [value, order]
@@ -1527,7 +1528,7 @@ paths:
                 tasks:
                   type: array
                   minItems: 1
-                  description: Sin IDs repetidos (422 si se repite alguno o no pertenece al grupo).
+                  description: Sin IDs repetidos (422 con `data.errors.tasks` si se repite alguno o no pertenece al grupo). Si el grupo no pertenece al proyecto de la ruta responde 404.
                   items:
                     type: object
                     required: [value, order]
@@ -1761,7 +1762,7 @@ paths:
       operationId: tasksAssign
       tags: [Tasks]
       summary: Asignar/desasignar tarea
-      description: 'Un ID **añade** ese usuario a los responsables (sin quitar a los demás) y lo deja como responsable principal (`assigned_to`); `null` quita a todos. Para sustituir el conjunto completo usa `PATCH /api/v1/tasks/{taskId}` con `assignees`. Limitación actual: si el usuario no es miembro activo del proyecto responde 422 con `data.error` vacío.'
+      description: 'Un ID **añade** ese usuario a los responsables (sin quitar a los demás) y lo deja como responsable principal (`assigned_to`); `null` quita a todos. Para sustituir el conjunto completo usa `PATCH /api/v1/tasks/{taskId}` con `assignees`. Si el usuario no es miembro activo del proyecto responde 422 con `data.errors.assignee_id`.'
       parameters:
         - $ref: '#/components/parameters/taskId'
       requestBody:
@@ -1932,6 +1933,7 @@ paths:
       operationId: tasksUpdateStart
       tags: [Tasks]
       summary: Cambiar fecha de inicio de tarea
+      description: 'Formato estricto `YYYY-MM-DD`; `null` la borra. Si la tarea tiene fecha de fin y el inicio quedaría después, responde 422 en `errors.date_start`.'
       parameters:
         - $ref: '#/components/parameters/taskId'
       requestBody:
@@ -1971,6 +1973,7 @@ paths:
       operationId: tasksUpdateEnd
       tags: [Tasks]
       summary: Cambiar fecha de fin de tarea
+      description: 'Formato estricto `YYYY-MM-DD`; `null` la borra. Si la tarea tiene fecha de inicio y el fin quedaría antes, responde 422 en `errors.date_end`.'
       parameters:
         - $ref: '#/components/parameters/taskId'
       requestBody:
@@ -2010,6 +2013,7 @@ paths:
       operationId: tasksUpdateHours
       tags: [Tasks]
       summary: Cambiar horas estimadas e invertidas
+      description: 'Duraciones `H:MM` o `HH:MM` (hasta 99:59); se devuelven como `HH:MM:SS`. `null` borra el valor y un campo que no se envía se mantiene.'
       parameters:
         - $ref: '#/components/parameters/taskId'
       requestBody:
@@ -2021,10 +2025,10 @@ paths:
               properties:
                 hours_expected:
                   type: [string, 'null']
-                  maxLength: 5
+                  pattern: '^[0-9]{1,2}:[0-5][0-9]$'
                 hours_inverted:
                   type: [string, 'null']
-                  maxLength: 5
+                  pattern: '^[0-9]{1,2}:[0-5][0-9]$'
       responses:
         '200':
           description: Horas actualizadas
@@ -2132,7 +2136,7 @@ paths:
       operationId: commentsCreate
       tags: [Comments]
       summary: Crear comentario (con menciones y N ficheros opcionales)
-      description: 'Hace falta texto, ficheros, `media_ids` o menciones. Las menciones a usuarios que no son miembros del proyecto se ignoran. En multipart los arrays van como `files[]`, `mentions[]` y `media_ids[]`. Limitación actual: los fallos de permisos (crear comentarios, subir ficheros) responden 422 en lugar de 403.'
+      description: 'Hace falta texto, ficheros, `media_ids` o menciones. Las menciones a usuarios que no son miembros del proyecto se ignoran. En multipart los arrays van como `files[]`, `mentions[]` y `media_ids[]`. Sin texto, ficheros ni menciones responde 422 con `data.errors.comment`; sin permiso para comentar o adjuntar un fichero, 403; si se supera la cuota de almacenamiento, 409.'
       parameters:
         - $ref: '#/components/parameters/taskId'
       requestBody:
@@ -2179,6 +2183,7 @@ paths:
           $ref: '#/components/responses/Error404'
         '422':
           $ref: '#/components/responses/Error422'
+        '409': { $ref: '#/components/responses/Error409' }
         '429': { $ref: '#/components/responses/Error429' }
 
   /api/v1/comments/{commentId}:
@@ -2676,7 +2681,7 @@ paths:
       operationId: teamInvitationsCreate
       tags: [Team Invitations]
       summary: Crear invitación de equipo
-      description: 'Requiere permiso para gestionar el equipo. `rol` es el ID de un rol existente del guard web; invitar con el rol de administrador devuelve 403. El tipo de usuario (interno o externo) sale del rol. Limitación actual: los errores de negocio (email duplicado, sin plazas libres) y los fallos de permiso responden 422 con el motivo en `data.error`, sin `data.errors`.'
+      description: 'Requiere permiso para gestionar el equipo. `rol` es el ID de un rol existente del guard web; invitar con el rol de administrador devuelve 403. El tipo de usuario (interno o externo) sale del rol. Los errores de negocio responden 422 con el campo en `data.errors` (`email` si ya existe, `internal_seats` o `external_limit` si no quedan plazas); los fallos de permiso, 403.'
       requestBody:
         required: true
         content:
@@ -2828,16 +2833,25 @@ components:
               error: Unauthenticated.
 
     Error403:
-      description: 'Prohibido: falta permiso (incluido el permiso de uso de la API), el scope OAuth (`mopux:read` para lecturas, `mopux:write` para escrituras) o el acceso está bloqueado por facturación (en ese caso el cuerpo es `{success: false, message}` sin `data`).'
+      description: 'Prohibido: falta permiso (incluido el permiso de uso de la API), el scope OAuth (`mopux:read` para lecturas, `mopux:write` para escrituras) o el acceso está bloqueado por facturación (`data.code: billing_access_blocked`).'
       content:
         application/json:
           schema:
             $ref: '#/components/schemas/ApiError'
-          example:
-            success: false
-            message: You are not authorized to modify this comment.
-            data:
-              error: You are not authorized to modify this comment.
+          examples:
+            forbidden:
+              value:
+                success: false
+                message: You are not authorized to modify this comment.
+                data:
+                  error: You are not authorized to modify this comment.
+            billingBlocked:
+              value:
+                success: false
+                message: Operations are blocked until the subscription is regularised. The representative can still access billing and export.
+                data:
+                  error: Operations are blocked until the subscription is regularised. The representative can still access billing and export.
+                  code: billing_access_blocked
 
     Error404:
       description: Recurso no encontrado
@@ -2851,6 +2865,18 @@ components:
             data:
               error: Resource not found.
 
+    Error409:
+      description: 'Conflicto de almacenamiento: se ha superado la cuota de la instalación o el almacenamiento se está inventariando o no está inicializado. El archivo no se ha guardado; consultar, descargar y borrar siguen disponibles.'
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ApiError'
+          example:
+            success: false
+            message: The contracted storage capacity has been reached. Free space or request an extension before uploading new files.
+            data:
+              error: The contracted storage capacity has been reached. Free space or request an extension before uploading new files.
+
     Error429:
       description: Demasiadas peticiones. Espera los segundos indicados en `Retry-After` antes de reintentar; la petición no se ha ejecutado.
       headers:
@@ -2861,13 +2887,12 @@ components:
       content:
         application/json:
           schema:
-            type: object
-            required: [message]
-            properties:
-              message:
-                type: string
+            $ref: '#/components/schemas/ApiError'
           example:
+            success: false
             message: Too Many Attempts.
+            data:
+              error: Too Many Attempts.
 
     UncertainWriteResult:
       description: Resultado incierto. Refresca el estado antes de reintentar; nunca reintentes automáticamente una creación.
@@ -3103,8 +3128,8 @@ components:
 
     ApiError:
       type: object
-      description: 'Envoltorio de error. `data` está presente en todos los errores salvo el 429 y el 403 por bloqueo de facturación.'
-      required: [success, message]
+      description: Envoltorio común de todas las respuestas de error.
+      required: [success, message, data]
       properties:
         success:
           type: boolean
@@ -3113,9 +3138,13 @@ components:
           type: string
         data:
           type: object
+          required: [error]
           properties:
             error:
               type: string
+            code:
+              type: string
+              description: 'Código estable para máquinas, solo en los casos que lo tienen. Valores actuales: `billing_access_blocked` (403, la instalación está bloqueada por facturación o la prueba ha terminado). Trata un código desconocido como un error genérico de su estado HTTP.'
             errors:
               type: object
               description: Solo en 422. Mensajes por campo.

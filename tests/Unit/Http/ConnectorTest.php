@@ -222,3 +222,63 @@ it('wraps transport failures and flags uncertain writes', function (string $meth
     'post' => ['POST', true],
     'delete' => ['DELETE', true],
 ]);
+
+it('exposes the stable error code and recognises plan restrictions', function (): void {
+    $client = new MockClient([
+        MockResponse::json(403, [
+            'success' => false,
+            'message' => 'The current plan does not include API access.',
+            'data' => ['error' => 'The current plan does not include API access.', 'code' => 'plan_feature_unavailable', 'feature' => 'api'],
+        ]),
+        MockResponse::json(403, [
+            'success' => false,
+            'message' => 'Operations are blocked.',
+            'data' => ['error' => 'Operations are blocked.', 'code' => 'billing_access_blocked'],
+        ]),
+        MockResponse::json(403, ['success' => false, 'message' => 'Forbidden.', 'data' => ['error' => 'Forbidden.']]),
+    ]);
+    $connector = connector($client);
+
+    $catch = static function (callable $request): AuthorizationException {
+        try {
+            $request();
+        } catch (AuthorizationException $exception) {
+            return $exception;
+        }
+
+        throw new RuntimeException('Expected an exception.');
+    };
+
+    $plan = $catch(fn () => $connector->get('projects'));
+    $billing = $catch(fn () => $connector->get('projects'));
+    $plain = $catch(fn () => $connector->get('projects'));
+
+    expect($plan->errorCode())->toBe(ApiException::CODE_PLAN_FEATURE_UNAVAILABLE)
+        ->and($plan->isPlanRestriction())->toBeTrue()
+        ->and($plan->planFeature())->toBe('api')
+        ->and($plan->isBillingBlocked())->toBeFalse()
+        ->and($billing->errorCode())->toBe(ApiException::CODE_BILLING_ACCESS_BLOCKED)
+        ->and($billing->isBillingBlocked())->toBeTrue()
+        ->and($billing->isPlanRestriction())->toBeFalse()
+        ->and($billing->planFeature())->toBeNull()
+        ->and($plain->errorCode())->toBeNull()
+        ->and($plain->isPlanRestriction())->toBeFalse()
+        ->and($plain->error())->toBe('Forbidden.');
+});
+
+it('reads the wrapped rate limit body of api 1.2.0', function (): void {
+    $client = new MockClient([MockResponse::json(429, [
+        'success' => false,
+        'message' => 'Too Many Attempts.',
+        'data' => ['error' => 'Too Many Attempts.'],
+    ], ['Retry-After' => '7'])]);
+
+    try {
+        connector($client)->get('projects');
+        $this->fail('Expected an exception.');
+    } catch (RateLimitException $exception) {
+        expect($exception->retryAfter)->toBe(7)
+            ->and($exception->getMessage())->toBe('Too Many Attempts. (HTTP 429)')
+            ->and($exception->errorCode())->toBeNull();
+    }
+});

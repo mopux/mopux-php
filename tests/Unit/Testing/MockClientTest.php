@@ -116,3 +116,13 @@ it('matches patterns against the api path', function (string $pattern, bool $exp
     ['projects/*', true],
     ['projects', false],
 ]);
+
+it('builds coded error envelopes and plan restrictions', function (): void {
+    expect(MockResponse::error(403, 'Blocked.', 'billing_access_blocked')->body)->toBe([
+        'success' => false, 'message' => 'Blocked.', 'data' => ['error' => 'Blocked.', 'code' => 'billing_access_blocked'],
+    ])
+        ->and(MockResponse::planRestricted('api')->body['data'])->toBe([
+            'error' => 'The current plan does not include this feature.', 'code' => 'plan_feature_unavailable', 'feature' => 'api',
+        ])
+        ->and(MockResponse::tooManyRequests(3)->body['data'])->toBe(['error' => 'Too Many Attempts.']);
+});

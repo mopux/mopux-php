@@ -7,6 +7,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+- `ApiException::errorCode()` reads the stable `data.code` of API 1.2.0, with `isPlanRestriction()`, `planFeature()` and `isBillingBlocked()` for the current codes (`plan_feature_unavailable`, `billing_access_blocked`).
+- `MockResponse::error()` accepts a code and extra `data` members; new `MockResponse::planRestricted()`.
+
+### Changed
+- `MockResponse::tooManyRequests()` and `serverError()` return the error envelope of API 1.2.0.
+- `ApiException::error()` returns `null` for an empty `data.error`.
+- Bundled spec updated to API 1.2.0 (in development): every error carries `data.error`, the 429 is wrapped and `ApiError` documents `data.code`.
+
 ## [0.1.1] - 2026-11-21
 
 ### Changed

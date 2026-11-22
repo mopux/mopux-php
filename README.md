@@ -195,6 +195,11 @@ Every exception extends `Mopux\Exceptions\MopuxException`.
 | `InvalidInputException` | rejected before sending |
 | `MalformedResponseException`, `InvalidPayloadException` | unexpected response shape |
 
+Every `ApiException` (the HTTP ones above) also gives `error()` (`data.error`) and `errorCode()`, the stable machine-readable `data.code` when the API sets one. Branch on the code, never on the message, and treat an unknown code as a generic error of its status. Helpers for the current codes:
+
+- `isPlanRestriction()`: the contracted plan does not include the feature; `planFeature()` names it (for example `api`). Retrying will not help until the plan changes.
+- `isBillingBlocked()`: the installation is blocked by billing or its public trial has ended.
+
 ```php
 use Mopux\Exceptions\UncertainWriteException;
 use Mopux\Exceptions\ValidationException;
@@ -310,7 +315,7 @@ $mopux = new Mopux('https://acme.mopux.com', 'token', $client);
 $client->assertSent('GET projects', times: 1);
 ```
 
-`MockResponse` has helpers for the API envelope: `ok()`, `error()`, `validation()`, `unauthenticated()`, `forbidden()`, `notFound()`, `tooManyRequests()` and `serverError()`.
+`MockResponse` has helpers for the API envelope: `ok()`, `error()` (with an optional `data.code`), `validation()`, `unauthenticated()`, `forbidden()`, `planRestricted()`, `notFound()`, `tooManyRequests()` and `serverError()`.
 
 ## Development
 

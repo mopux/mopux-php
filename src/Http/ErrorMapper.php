@@ -18,8 +18,9 @@ use Psr\Http\Message\ResponseInterface;
 /**
  * Maps an HTTP error response to the matching SDK exception.
  *
- * The API wraps most errors as `{success: false, message, data: {error, errors?}}`,
- * but some (429, 500, billing 403) use Laravel's plain `{message}` body; both are handled.
+ * API 1.2.0 wraps every error as `{success: false, message, data: {error, code?, errors?}}`.
+ * Older servers answer some errors (429, 500, billing 403) with a plain `{message}` body;
+ * both are handled.
  *
  * @internal
  */

@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Mopux\Testing;
 
 use Http\Discovery\Psr17FactoryDiscovery;
+use Mopux\Exceptions\ApiException;
 use Psr\Http\Message\ResponseInterface;
 
 /**
@@ -33,9 +34,24 @@ final class MockResponse
     /**
      * Error envelope: `{success: false, message, data: {error}}`.
      */
-    public static function error(int $status, string $message = 'Error'): self
+    /**
+     * Error envelope; `$code` fills `data.code` and `$data` adds other members of `data`.
+     *
+     * @param  array<string, mixed>  $data
+     */
+    public static function error(int $status, string $message = 'Error', ?string $code = null, array $data = []): self
     {
-        return new self($status, ['success' => false, 'message' => $message, 'data' => ['error' => $message]]);
+        $payload = ['error' => $message] + ($code === null ? [] : ['code' => $code]) + $data;
+
+        return new self($status, ['success' => false, 'message' => $message, 'data' => $payload]);
+    }
+
+    /**
+     * 403 because the contracted plan does not include `$feature`.
+     */
+    public static function planRestricted(string $feature = 'api', string $message = 'The current plan does not include this feature.'): self
+    {
+        return self::error(403, $message, ApiException::CODE_PLAN_FEATURE_UNAVAILABLE, ['feature' => $feature]);
     }
 
     /**
@@ -71,12 +87,14 @@ final class MockResponse
 
     public static function tooManyRequests(?int $retryAfter = null): self
     {
-        return new self(429, ['message' => 'Too Many Attempts.'], $retryAfter === null ? [] : ['Retry-After' => (string) $retryAfter]);
+        $message = 'Too Many Attempts.';
+
+        return new self(429, ['success' => false, 'message' => $message, 'data' => ['error' => $message]], $retryAfter === null ? [] : ['Retry-After' => (string) $retryAfter]);
     }
 
     public static function serverError(int $status = 500): self
     {
-        return new self($status, ['message' => 'Server Error']);
+        return self::error($status, 'Server Error.');
     }
 
     /**
