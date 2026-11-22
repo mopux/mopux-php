@@ -7,15 +7,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.2.0] - 2026-11-22
+
+Targets Mopux API 1.2.0. The token endpoints need a Mopux release that includes them; older installations answer 404 there.
+
 ### Added
 - `auth()->tokens()->list()` and `->delete($id)` with the `ApiToken` DTO: list and revoke the user's API tokens (API 1.2.0, 71 operations).
 - `ApiException::errorCode()` reads the stable `data.code` of API 1.2.0, with `isPlanRestriction()`, `planFeature()` and `isBillingBlocked()` for the current codes (`plan_feature_unavailable`, `billing_access_blocked`).
 - `MockResponse::error()` accepts a code and extra `data` members; new `MockResponse::planRestricted()`.
+- Comment and notification lists accept both the plain list (API up to 1.1) and Laravel pagination with `meta` (API 1.2): `Paginated::fromListOrLaravel()`.
 
 ### Changed
 - `MockResponse::tooManyRequests()` and `serverError()` return the error envelope of API 1.2.0.
 - `ApiException::error()` returns `null` for an empty `data.error`.
-- Bundled spec updated to API 1.2.0 (in development): every error carries `data.error`, the 429 is wrapped and `ApiError` documents `data.code`.
+- Bundled spec updated to API 1.2.0: every error carries `data.error` (and `data.code` when it has one), the 429 is wrapped, plan restrictions and token management are documented (71 operations).
 
 ## [0.1.1] - 2026-11-21
 
@@ -51,6 +56,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Documentation
 - README covering installation, authentication (tokens, OAuth refresh, multi-tenant), resources, inputs, uploads, pagination, errors, retries, Laravel and testing; SECURITY.md.
 
-[Unreleased]: https://github.com/mopux/mopux-php/compare/v0.1.1...HEAD
+[Unreleased]: https://github.com/mopux/mopux-php/compare/v0.2.0...HEAD
+[0.2.0]: https://github.com/mopux/mopux-php/compare/v0.1.1...v0.2.0
 [0.1.1]: https://github.com/mopux/mopux-php/compare/v0.1.0...v0.1.1
 [0.1.0]: https://github.com/mopux/mopux-php/releases/tag/v0.1.0
