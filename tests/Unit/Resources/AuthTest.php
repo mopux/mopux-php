@@ -7,6 +7,7 @@ use Mopux\Data\AuthToken;
 use Mopux\Data\User;
 use Mopux\Exceptions\AuthenticationException;
 use Mopux\Exceptions\AuthorizationException;
+use Mopux\Exceptions\NotFoundException;
 use Mopux\Exceptions\ValidationException;
 use Mopux\Http\RetryPolicy;
 use Mopux\Mopux;
@@ -144,5 +145,5 @@ it('reports a token of another user as not found', function (): void {
     $client = new MockClient([MockResponse::notFound()]);
 
     expect(fn () => (new Mopux(authConfig('7|secret'), httpClient: $client))->auth()->tokens()->delete(5))
-        ->toThrow(\Mopux\Exceptions\NotFoundException::class);
+        ->toThrow(NotFoundException::class);
 });

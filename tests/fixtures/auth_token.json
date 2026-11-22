@@ -1,0 +1,9 @@
+{
+    "token": "12|plain-text-token",
+    "token_type": "Bearer",
+    "user": {
+        "id": 3,
+        "name": "Ada Lovelace",
+        "email": "ada@acme.test"
+    }
+}

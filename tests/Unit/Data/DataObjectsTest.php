@@ -2,7 +2,9 @@
 
 declare(strict_types=1);
 
+use Mopux\Data\ApiToken;
 use Mopux\Data\Attachment;
+use Mopux\Data\AuthToken;
 use Mopux\Data\Comment;
 use Mopux\Data\DataObject;
 use Mopux\Data\MarkdownHelp;
@@ -18,6 +20,7 @@ use Mopux\Data\TaskGroup;
 use Mopux\Data\TeamInvitation;
 use Mopux\Data\TeamMember;
 use Mopux\Data\Touch;
+use Mopux\Data\User;
 use Mopux\Data\UserBrief;
 use Mopux\Enums\ProjectStatus;
 use Mopux\Enums\TaskPriority;
@@ -43,6 +46,12 @@ dataset('round trips', [
     'team invitation' => [TeamInvitation::class, 'team_invitation'],
     'move options' => [MoveOptions::class, 'move_options'],
     'markdown help' => [MarkdownHelp::class, 'markdown_help'],
+    'user' => [User::class, 'user'],
+    'auth token' => [AuthToken::class, 'auth_token'],
+    'attachment' => [Attachment::class, 'attachment'],
+    'team member' => [TeamMember::class, 'team_member'],
+    'user brief' => [UserBrief::class, 'user_brief'],
+    'api token' => [ApiToken::class, 'api_token'],
 ]);
 
 it('serializes back to an equivalent object', function (string $class, string $fixture): void {

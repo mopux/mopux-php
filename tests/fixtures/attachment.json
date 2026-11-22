@@ -1,0 +1,12 @@
+{
+    "id": 77,
+    "title": "spec.pdf",
+    "type": "document",
+    "mimetype": "application/pdf",
+    "size": 20480,
+    "url": "https://acme.mopux.com/api/attachments/77?signature=x",
+    "comment_ids": [
+        55
+    ],
+    "direct": false
+}
