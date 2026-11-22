@@ -34,7 +34,7 @@ final class Comments extends Resource
 
         $response = $this->connector->get(self::taskPath($taskId), ['page' => $page, 'per_page' => $perPage]);
 
-        return Paginated::fromList($response->array(), Comment::fromArray(...), $page, $perPage);
+        return Paginated::fromListOrLaravel($response->array(), Comment::fromArray(...), $page, $perPage);
     }
 
     /**

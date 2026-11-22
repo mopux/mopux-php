@@ -21,6 +21,21 @@ it('lists notifications', function (): void {
         ->and($page->hasMorePages())->toBeTrue();
 });
 
+it('accepts the Laravel pagination of API 1.2 for notifications', function (): void {
+    $items = apiFixture('notifications_list');
+    $client = new MockClient(['GET notifications' => MockResponse::ok([
+        'data' => $items,
+        'links' => ['first' => null, 'last' => null, 'prev' => null, 'next' => null],
+        'meta' => ['current_page' => 1, 'last_page' => 1, 'per_page' => 25, 'total' => count($items), 'from' => 1, 'to' => count($items)],
+    ])]);
+
+    $page = mopux($client)->notifications()->list();
+
+    expect($page->items)->toHaveCount(count($items))
+        ->and($page->total)->toBe(count($items))
+        ->and($page->hasMorePages())->toBeFalse();
+});
+
 it('iterates all notifications', function (): void {
     $client = new MockClient(['GET notifications' => [okFixture('notifications_list'), MockResponse::ok([])]]);
 

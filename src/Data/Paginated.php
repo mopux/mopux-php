@@ -95,6 +95,26 @@ final class Paginated
     }
 
     /**
+     * Accepts both shapes of an endpoint that is moving to Laravel pagination:
+     * a plain list (API up to 1.1) or `{data, links, meta}` (API 1.2). The plain
+     * list carries no totals, so hasMore() falls back to "the page was full".
+     *
+     * @template TItem
+     *
+     * @param  array<array-key, mixed>  $data
+     * @param  callable(array<array-key, mixed>): TItem  $factory
+     * @return self<TItem>
+     */
+    public static function fromListOrLaravel(array $data, callable $factory, int $page = 1, ?int $perPage = null): self
+    {
+        if (! array_is_list($data) && array_key_exists('data', $data) && is_array($data['meta'] ?? null)) {
+            return self::fromLaravel($data, $factory);
+        }
+
+        return self::fromList($data, $factory, $page, $perPage);
+    }
+
+    /**
      * Lazily walks every page, starting at $firstPage, yielding the items one by one.
      * Pages are requested only as the generator advances.
      *

@@ -32,7 +32,7 @@ final class Notifications extends Resource
 
         $response = $this->connector->get('notifications', ['filter' => $filter, 'page' => $page, 'per_page' => $perPage]);
 
-        return Paginated::fromList($response->array(), Notification::fromArray(...), $page, $perPage);
+        return Paginated::fromListOrLaravel($response->array(), Notification::fromArray(...), $page, $perPage);
     }
 
     /**

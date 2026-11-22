@@ -32,6 +32,24 @@ it('iterates all comments until a partial page', function (): void {
     $client->assertSentCount(2);
 });
 
+it('accepts the Laravel pagination of API 1.2 for comments', function (): void {
+    $laravel = static fn (array $items, int $page, int $lastPage): MockResponse => MockResponse::ok([
+        'data' => $items,
+        'links' => ['first' => null, 'last' => null, 'prev' => null, 'next' => null],
+        'meta' => ['current_page' => $page, 'last_page' => $lastPage, 'per_page' => 1, 'total' => 2, 'from' => $page, 'to' => $page],
+    ]);
+    $client = new MockClient(['GET tasks/101/comments' => [$laravel([apiFixture('comment')], 1, 2), $laravel([apiFixture('comment_reply')], 2, 2)]]);
+
+    $first = mopux($client)->comments()->list(101, perPage: 1);
+    $all = iterator_to_array(mopux(new MockClient(['GET tasks/101/comments' => [$laravel([apiFixture('comment')], 1, 2), $laravel([apiFixture('comment_reply')], 2, 2)]]))->comments()->all(101, perPage: 1), false);
+
+    expect($first->items[0])->toBeInstanceOf(Comment::class)
+        ->and($first->total)->toBe(2)
+        ->and($first->lastPage)->toBe(2)
+        ->and($first->hasMorePages())->toBeTrue()
+        ->and($all)->toHaveCount(2);
+});
+
 it('creates a json comment with mentions', function (): void {
     $client = new MockClient(['POST tasks/101/comments' => okFixture('comment', 'Comment created successfully.')]);
 
