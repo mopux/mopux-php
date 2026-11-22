@@ -115,3 +115,34 @@ it('logs out', function (): void {
     $client->assertSent('POST auth/logout', 1);
     expect($client->lastRecorded()->body())->toBe('');
 });
+
+it('lists and revokes the API tokens of the user', function (): void {
+    $client = new MockClient([
+        'GET auth/tokens' => MockResponse::ok([
+            ['id' => 9, 'name' => 'desktop', 'current' => false, 'last_used_at' => '2026-11-21 10:00:00', 'expires_at' => null, 'created_at' => '2026-11-01 09:00:00'],
+            ['id' => 7, 'name' => 'script', 'current' => true, 'last_used_at' => null, 'expires_at' => null, 'created_at' => '2026-10-01 09:00:00'],
+        ]),
+        'DELETE auth/tokens/9' => MockResponse::ok([], 'API token revoked successfully.'),
+    ]);
+    $tokens = (new Mopux(authConfig('7|secret'), httpClient: $client))->auth()->tokens();
+
+    $list = $tokens->list();
+    $tokens->delete(9);
+
+    expect($list)->toHaveCount(2)
+        ->and($list[0]->id)->toBe(9)
+        ->and($list[0]->current)->toBeFalse()
+        ->and($list[0]->lastUsedAt?->format('Y-m-d H:i:s'))->toBe('2026-11-21 10:00:00')
+        ->and($list[1]->current)->toBeTrue()
+        ->and($list[1]->lastUsedAt)->toBeNull()
+        ->and($list[1]->toArray()['name'])->toBe('script')
+        ->and($client->lastRecorded()->request->getMethod())->toBe('DELETE')
+        ->and((string) $client->lastRecorded()->request->getUri())->toEndWith('/api/v1/auth/tokens/9');
+});
+
+it('reports a token of another user as not found', function (): void {
+    $client = new MockClient([MockResponse::notFound()]);
+
+    expect(fn () => (new Mopux(authConfig('7|secret'), httpClient: $client))->auth()->tokens()->delete(5))
+        ->toThrow(\Mopux\Exceptions\NotFoundException::class);
+});

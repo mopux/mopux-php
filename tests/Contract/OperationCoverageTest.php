@@ -40,6 +40,8 @@ function sdkOperations(): array
         'POST /api/v1/auth/login' => fn (Mopux $m) => $m->auth()->login('ada@acme.test', 'secret'),
         'POST /api/v1/auth/logout' => fn (Mopux $m) => $m->auth()->logout(),
         'GET /api/v1/auth/user' => fn (Mopux $m) => $m->auth()->user(),
+        'GET /api/v1/auth/tokens' => fn (Mopux $m) => $m->auth()->tokens()->list(),
+        'DELETE /api/v1/auth/tokens/{tokenId}' => fn (Mopux $m) => $m->auth()->tokens()->delete(9),
 
         'GET /api/v1/projects' => fn (Mopux $m) => $m->projects()->list(),
         'POST /api/v1/projects' => fn (Mopux $m) => $m->projects()->create(new ProjectCreate('Web')),
@@ -144,7 +146,7 @@ it('covers every operation of the spec', function (): void {
 
     expect(array_values(array_diff($spec, $sdk)))->toBe([], 'Operations in the spec without an SDK method')
         ->and(array_values(array_diff($sdk, $spec)))->toBe([], 'SDK operations that are not in the spec')
-        ->and(count($spec))->toBe(69);
+        ->and(count($spec))->toBe(71);
 });
 
 it('sends each operation to its endpoint', function (string $operation): void {

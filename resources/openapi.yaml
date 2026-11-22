@@ -14,6 +14,7 @@ info:
     - OAuth requiere mopux:read para lecturas y mopux:write para escrituras (logout no requiere scope).
     - Errores: todas las respuestas de error usan `{success: false, message, data: {error, code?, errors?}}`, también el 401, el 429 y el 403 por bloqueo de facturación. `data.code` es un código estable para máquinas cuando el caso lo tiene (por ejemplo `billing_access_blocked` o `plan_feature_unavailable`); en 422 los mensajes por campo van en `data.errors.{campo}`. Un fallo inesperado responde 500 con `message: Server Error.` y nunca incluye detalles internos.
     - Plan: la API v1 forma parte del plan contratado. Si el plan de la instalación no la incluye, el login y cualquier token existente responden 403 con `data.code: plan_feature_unavailable` y `data.feature: api`. Los tokens no se borran: vuelven a funcionar si cambia el plan. El logout sigue disponible.
+    - Tokens: cada login crea un token personal nuevo. Se listan y revocan con `GET`/`DELETE /api/v1/auth/tokens`. Cambiar o restablecer la contraseña revoca todos los tokens del usuario (API, MCP y OAuth), y los tokens de API sin uso en 90 días se borran cada noche: el cliente debe volver a hacer login cuando reciba un 401.
     - Límite de peticiones: 30/min en `auth/login` y 120/min en el resto; al superarlo responde 429 con `Retry-After` (segundos).
     - En `multipart/form-data`, los arrays van con una parte por elemento y nombre con corchetes: `files[]`, `mentions[]`, `media_ids[]`.
     - Paginación: Laravel `data/links/meta` (proyectos, actividad, invitaciones), campos de página en el objeto (`team`, adjuntos) o listas sin metadatos (comentarios, notificaciones). `tasks/my` no está paginado. Las páginas se piden con `page`.
@@ -149,6 +150,56 @@ paths:
                           user: { $ref: '#/components/schemas/AuthenticatedUser' }
         '401': { $ref: '#/components/responses/Error401' }
         '403': { $ref: '#/components/responses/Error403' }
+        '429': { $ref: '#/components/responses/Error429' }
+
+  /api/v1/auth/tokens:
+    get:
+      operationId: authTokensList
+      tags: [Auth]
+      summary: Listar mis tokens de API
+      description: 'Tokens personales de API del usuario autenticado (los que crea `auth/login`), del más nuevo al más antiguo. Nunca devuelve el secreto. `current` marca el token de la petición (siempre `false` con OAuth). Los tokens MCP no aparecen: se gestionan en la página de conectores de la web.'
+      responses:
+        '200':
+          description: Tokens recuperados
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/ApiSuccess'
+                  - type: object
+                    properties:
+                      data:
+                        type: array
+                        items: { $ref: '#/components/schemas/ApiToken' }
+        '401': { $ref: '#/components/responses/Error401' }
+        '403': { $ref: '#/components/responses/Error403' }
+        '429': { $ref: '#/components/responses/Error429' }
+
+  /api/v1/auth/tokens/{tokenId}:
+    delete:
+      operationId: authTokensDelete
+      tags: [Auth]
+      summary: Revocar uno de mis tokens de API
+      description: 'Borra un token de API del usuario autenticado, por ejemplo uno filtrado. Revocar el token de la propia petición equivale al logout. Un token de otro usuario, un token MCP o un id inexistente responden 404.'
+      parameters:
+        - in: path
+          name: tokenId
+          required: true
+          schema: { type: integer }
+      responses:
+        '200':
+          description: Token revocado
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/ApiSuccess'
+                  - type: object
+                    properties:
+                      data: { type: array, maxItems: 0 }
+        '401': { $ref: '#/components/responses/Error401' }
+        '403': { $ref: '#/components/responses/Error403' }
+        '404': { $ref: '#/components/responses/Error404' }
         '429': { $ref: '#/components/responses/Error429' }
 
   /api/v1/tasks/my:
@@ -3134,6 +3185,23 @@ components:
         data: {}
         message:
           type: string
+
+    ApiToken:
+      type: object
+      required: [id, name, current, last_used_at, expires_at, created_at]
+      properties:
+        id: { type: integer }
+        name: { type: string }
+        current:
+          type: boolean
+          description: El token con el que se ha hecho la petición.
+        last_used_at:
+          type: [string, 'null']
+          description: Último uso (`Y-m-d H:i:s`), o `null` si nunca se ha usado.
+        expires_at:
+          type: [string, 'null']
+          description: Caducidad (`Y-m-d H:i:s`), o `null` si no caduca.
+        created_at: { type: string }
 
     ApiError:
       type: object

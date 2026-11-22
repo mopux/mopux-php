@@ -45,6 +45,14 @@ final class Auth extends Resource
     }
 
     /**
+     * Lists and revokes the user's API tokens.
+     */
+    public function tokens(): AuthTokens
+    {
+        return new AuthTokens($this->connector);
+    }
+
+    /**
      * The user that owns the current token.
      */
     public function user(): User

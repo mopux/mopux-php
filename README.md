@@ -3,7 +3,7 @@
 Official PHP client for the [Mopux](https://www.mopux.com) API (`/api/v1`), with first-class Laravel integration.
 
 - Typed, immutable data objects for every response and enums for statuses and priorities.
-- Every API operation covered (69/69), checked against the OpenAPI spec in CI.
+- Every API operation covered (71/71), checked against the OpenAPI spec in CI.
 - Works with any PSR-18 HTTP client (Guzzle is used automatically when installed).
 - Safe by default: retries rate-limited requests and failed reads, **never** retries a write whose outcome is unknown.
 - Testing helpers: `MockClient` for plain PHP and `Mopux::fake()` for Laravel.
@@ -75,7 +75,16 @@ $mopux->auth()->user();     // the token's user
 $mopux->auth()->logout();   // revokes the token
 ```
 
-The user needs the "API use" permission; otherwise the API answers `403`.
+Each login creates a new token. List and revoke the user's API tokens (for example a leaked one); secrets are never returned:
+
+```php
+foreach ($mopux->auth()->tokens()->list() as $token) {
+    echo $token->id, ' ', $token->name, ' ', $token->current ? '(this client)' : '', PHP_EOL;
+}
+$mopux->auth()->tokens()->delete($leakedTokenId);
+```
+
+The user needs the "API use" permission, and the installation's plan must include the API; otherwise the API answers `403` (`isPlanRestriction()` tells the plan case apart).
 
 **OAuth.** When the installation enables OAuth, pass the access token the same way. Reads need the `mopux:read` scope and writes `mopux:write`. To refresh tokens automatically, use a `CallbackToken`: after a `401` the client calls `refresh` once and repeats the request.
 

@@ -8,6 +8,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+- `auth()->tokens()->list()` and `->delete($id)` with the `ApiToken` DTO: list and revoke the user's API tokens (API 1.2.0, 71 operations).
 - `ApiException::errorCode()` reads the stable `data.code` of API 1.2.0, with `isPlanRestriction()`, `planFeature()` and `isBillingBlocked()` for the current codes (`plan_feature_unavailable`, `billing_access_blocked`).
 - `MockResponse::error()` accepts a code and extra `data` members; new `MockResponse::planRestricted()`.
 
