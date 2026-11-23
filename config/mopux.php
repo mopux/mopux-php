@@ -19,6 +19,8 @@ return [
 
     'token' => env('MOPUX_TOKEN'),
 
+    'webhook_secret' => env('MOPUX_WEBHOOK_SECRET'),
+
     /*
     |--------------------------------------------------------------------------
     | HTTP

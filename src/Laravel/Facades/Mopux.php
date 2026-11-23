@@ -6,12 +6,15 @@ namespace Mopux\Laravel\Facades;
 
 use Closure;
 use Illuminate\Contracts\Config\Repository;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Facade;
 use Mopux\Config;
+use Mopux\Exceptions\MopuxException;
 use Mopux\Http\RetryPolicy;
 use Mopux\Laravel\Testing\MopuxFake;
 use Mopux\Mopux as MopuxClient;
 use Mopux\Testing\MockClient;
+use Mopux\Webhooks\WebhookEvent;
 
 /**
  * @method static \Mopux\Resources\Auth auth()
@@ -63,6 +66,17 @@ final class Mopux extends Facade
         self::swap($fake);
 
         return $fake;
+    }
+
+    public static function webhook(Request $request): WebhookEvent
+    {
+        $secret = config('mopux.webhook_secret');
+
+        if (! is_string($secret) || $secret === '') {
+            throw new MopuxException('The Mopux webhook secret is not configured: set MOPUX_WEBHOOK_SECRET or config("mopux.webhook_secret").');
+        }
+
+        return WebhookEvent::fromPayload($request->getContent(), $request->headers->all(), $secret);
     }
 
     protected static function getFacadeAccessor(): string

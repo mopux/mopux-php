@@ -282,6 +282,71 @@ class SyncTasks
 $tenant = Mopux::forTenant($installation->url, $installation->token);
 ```
 
+## Recibir webhooks
+
+Mopux envía un POST firmado con el secreto del endpoint (`whsec_…`). El SDK
+verifica los bytes originales del cuerpo con una tolerancia de 300 segundos
+antes de decodificar el JSON.
+
+### PHP plano
+
+Con una petición PSR-7, usa `WebhookEvent::fromRequest()`. Si tu servidor ya
+te da el cuerpo sin modificar y las cabeceras, usa `WebhookEvent::fromPayload($rawBody, $headers, $secret)`.
+
+```php
+use Mopux\Exceptions\InvalidPayloadException;
+use Mopux\Exceptions\InvalidWebhookSignatureException;
+use Mopux\Webhooks\WebhookEvent;
+
+try {
+    $event = WebhookEvent::fromRequest($request, $secret);
+} catch (InvalidWebhookSignatureException) {
+    http_response_code(401);
+    return;
+} catch (InvalidPayloadException) {
+    http_response_code(400);
+    return;
+}
+
+// Registra $event->deliveryId y encola el trabajo una sola vez por entrega.
+http_response_code(204);
+```
+
+Para eventos conocidos, `$event->event` es un `WebhookEventType`. Los nombres
+nuevos se reciben como cadenas. `$event->task()` devuelve el DTO `Task` para
+tareas completas. Si una tarea se ha borrado, devuelve `null` y el contenido
+reducido queda disponible en `$event->data['task']`.
+
+### Laravel
+
+Configura `MOPUX_WEBHOOK_SECRET`. Puedes llamar a `Mopux::webhook($request)`
+desde un controlador o usar el middleware para responder con 401 ante una firma
+inválida y con 400 ante un sobre inválido.
+
+```php
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Route;
+use Mopux\Laravel\Middleware\VerifyMopuxWebhook;
+use Mopux\Webhooks\WebhookEvent;
+
+Route::post('/webhooks/mopux', function (Request $request) {
+    $event = $request->attributes->get(WebhookEvent::class);
+    // Registra $event->deliveryId y encola el trabajo una sola vez por entrega.
+    return response()->noContent();
+})->middleware(VerifyMopuxWebhook::class);
+```
+
+Registra la ruta fuera del grupo con protección CSRF o excluye esta URI de esa
+protección. En tests, `MopuxFake::webhook(WebhookEventType::Ping, ['message' =>
+'Mopux webhook test'])` crea una petición Laravel firmada con
+`config('mopux.webhook_secret')`. La clase está en `Mopux\Laravel\Testing`.
+
+Usa `X-Mopux-Delivery` (`$event->deliveryId`) como clave de idempotencia. Los
+reintentos conservan ese identificador. Los reenvíos manuales reciben uno nuevo
+y mantienen el `id` del evento. El orden de llegada no está garantizado. Usa
+`occurredAt` si necesitas ordenar los cambios. Responde con un 2xx en cuanto
+la entrega quede registrada y el trabajo esté encolado.
+
 ## Testing
 
 ### Laravel

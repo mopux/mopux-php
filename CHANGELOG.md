@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+- Incoming webhook signature verification and typed event parsing for PSR-7 and raw HTTP payloads.
+- Laravel webhook configuration, facade, verification middleware and signed request fake.
+
 ## [0.2.0] - 2026-11-22
 
 Targets Mopux API 1.2.0. The token endpoints need a Mopux release that includes them; older installations answer 404 there.
