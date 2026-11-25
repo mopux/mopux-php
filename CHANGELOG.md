@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.3.0] - 2026-11-25
+
+Targets Mopux API 1.3.0 (Mopux 1.14.0). Outgoing webhooks are available on installations whose plan and contract include them.
+
 ### Added
 - Incoming webhook signature verification and typed event parsing for PSR-7 and raw HTTP payloads.
 - Laravel webhook configuration, facade, verification middleware and signed request fake.
@@ -60,7 +64,8 @@ Targets Mopux API 1.2.0. The token endpoints need a Mopux release that includes 
 ### Documentation
 - README covering installation, authentication (tokens, OAuth refresh, multi-tenant), resources, inputs, uploads, pagination, errors, retries, Laravel and testing; SECURITY.md.
 
-[Unreleased]: https://github.com/mopux/mopux-php/compare/v0.2.0...HEAD
+[Unreleased]: https://github.com/mopux/mopux-php/compare/v0.3.0...HEAD
+[0.3.0]: https://github.com/mopux/mopux-php/compare/v0.2.0...v0.3.0
 [0.2.0]: https://github.com/mopux/mopux-php/compare/v0.1.1...v0.2.0
 [0.1.1]: https://github.com/mopux/mopux-php/compare/v0.1.0...v0.1.1
 [0.1.0]: https://github.com/mopux/mopux-php/releases/tag/v0.1.0
